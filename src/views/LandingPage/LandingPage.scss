@@ -1,0 +1,15 @@
+@import "./../../index.scss";
+
+.landing-page-container {
+
+  .title {
+    background: green;
+    color: red;
+  }
+
+  .content {
+    background: black;
+    color: white;
+    font-weight: bold;
+  }
+}
