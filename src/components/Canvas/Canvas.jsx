@@ -3,6 +3,7 @@ import { Stage, Layer, Image, Line } from 'react-konva';
 import useImage from 'use-image';
 
 import './Canvas.scss';
+import ImageScaleHelper from '../../helpers/ImageScaleHelper';
 
 const CanvasComponent = ({url}) => {
   const [tool, setTool] = useState('brush');
@@ -19,7 +20,22 @@ const CanvasComponent = ({url}) => {
 
   const LoadImage = () => {
     const [image] = useImage(url);
-    return <Image image={image} width={windowWidth} height={windowWidth} />;
+
+    if (image) {
+      const canvasInfo = {
+        width: windowWidth,
+        height: windowWidth
+      };
+  
+      const imageInfo = {
+        width: image.width,
+        height: image.height,
+      };
+  
+      const scaleInfo = ImageScaleHelper.scaleImage(canvasInfo, imageInfo, false);
+  
+      return <Image image={image} x={scaleInfo.x} y={scaleInfo.y} width={scaleInfo.width} height={scaleInfo.height} />;
+    } 
   };
 
   const handleMouseDown = (e) => {
@@ -61,7 +77,7 @@ const CanvasComponent = ({url}) => {
         onMouseup={handleMouseUp}
         >
         <Layer>
-          <LoadImage />
+          { url && <LoadImage /> }
         </Layer>
         <Layer>
           {lines.map((line, i) => (
