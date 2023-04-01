@@ -10,9 +10,11 @@ const LandingPage = () => {
     <div className="landing-page-container">
       <div className="header-container">
         <div className="title-container">
-        <Typography className="title" variant="h1" component="h2">
-          Image Canvas
-        </Typography>
+          <div className="outer-title">
+            <Typography className="title" variant="h2" component="h2">
+              Image Canvas
+            </Typography>
+          </div>
         </div>
       </div>
       <div className="content-container">

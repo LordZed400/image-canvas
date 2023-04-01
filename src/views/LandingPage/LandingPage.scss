@@ -1,15 +1,41 @@
 @import "./../../index.scss";
 
 .landing-page-container {
+  background: $mercury;
 
-  .title {
-    background: green;
-    color: red;
+  .title-container {
+    align-items: center;
+    background: $white;
+    display: flex;
+    height: 100px;
+    justify-content: center;
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    
+    .outer-title {
+      border-bottom: 2px solid $black;
+      padding: 5px 15px;
+    }
+
+    .title {
+      border-bottom: 2px solid $black;
+      color: $black;
+      display: inline-block;
+      font-family: "Lobster";
+      padding: 0 15px;
+    }
   }
 
-  .content {
-    background: black;
-    color: white;
-    font-weight: bold;
+  .content-container {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    overflow: hidden;
+    width: 100vw;
+    
+    .content {
+      padding-top: 120px;
+    }
   }
 }

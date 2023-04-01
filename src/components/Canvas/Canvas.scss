@@ -1,5 +1,8 @@
 @import "./../../index.scss";
 
 .canvas-container {
-  
+  background-color: $white;
+  border: 2px solid $gray-chateau;
+  border-radius: 5px;
+  margin-top: 15px;
 }

@@ -9,25 +9,27 @@ import './FileHandler.scss';
 const FileHandler = () => {
   const [canvasImage, setCanvasImage] = useState();
   const [fileInput, setFileInput] = useState("");
-  const [fileName, setFileName] = useState("No file uploaded");
   
   const handleFileUpload = (inputValue) => {
     setCanvasImage(URL.createObjectURL(inputValue.files[0]));
     setFileInput(inputValue.value);
-    setFileName(inputValue.files[0].name);
   }
 
   const clearFile = () => {
     setFileInput("");
     setCanvasImage();
-    setFileName("No file uploaded");
   }
 
   return (
     <div className="file-handler-container">
-      <FileInput clickEvent={handleFileUpload} clearEvent={clearFile} fileInput={fileInput} />
-      {fileName}
-      <ButtonComponent clickEvent={clearFile}>Clear</ButtonComponent>
+      <div className="button-container">
+        <div className="upload-btn">
+          <FileInput clickEvent={handleFileUpload} clearEvent={clearFile} fileInput={fileInput} />
+        </div>
+        <div className="clear-btn">
+          <ButtonComponent clickEvent={clearFile} disabled={fileInput == ""}>Clear</ButtonComponent>
+        </div>
+      </div>
       <CustomCanvas url={canvasImage} />
     </div>
   );

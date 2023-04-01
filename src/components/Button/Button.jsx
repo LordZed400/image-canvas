@@ -3,11 +3,11 @@ import { Button } from '@mui/material';
 
 import './Button.scss';
 
-const ButtonComponent = ({children, clickEvent}) => {
+const ButtonComponent = ({children, clickEvent, disabled}) => {
 
   return (
     <div className="button-container">
-      <Button onClick={clickEvent} className="button" variant="contained">
+      <Button onClick={clickEvent} className="button" variant="contained" disabled={disabled}>
         {children}
       </Button>
     </div>
