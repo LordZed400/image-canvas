@@ -62,32 +62,47 @@
       }
     }
 
-    .drawer-list-item {
+    .drawer-list-label {
+      font-family: "RobotoBold";
+      margin-right: 10px;
+    }
+
+    .drawer-list-tool-container {
+
+      .drawer-list-item {
       
-      &:hover {
-        cursor: pointer;
-      }
-
-      .drawer-list-stack {
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-
-        .min-value {
-          font-size: 20px;
-          padding-right: 15px;
+        &:hover {
+          cursor: pointer;
         }
-
-        .max-value {
-          font-size: 20px;
-          padding-left: 15px;
+  
+        .drawer-list-stack {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+  
+          &.vertical-stack {
+            flex-direction: column;
+          }
+          
+          .drawer-list-stack-item {
+            font-size: 20px;
+          }
+  
+          .min-value {
+            padding-right: 15px;
+          }
+  
+          .max-value {
+            padding-left: 15px;
+          }        
         }
-        
       }
-
-      .drawer-list-label {
-        font-family: "RobotoBold";
-        margin-right: 10px;
+      
+    }
+    
+    .drawer-item-details-container {
+      .drawer-list-stack-item {
+        font-size: 15px;
       }
     }
   }
