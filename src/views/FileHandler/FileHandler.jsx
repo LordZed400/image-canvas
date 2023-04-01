@@ -27,7 +27,7 @@ const FileHandler = () => {
           <FileInput clickEvent={handleFileUpload} clearEvent={clearFile} fileInput={fileInput} />
         </div>
         <div className="clear-btn">
-          <ButtonComponent clickEvent={clearFile} disabled={fileInput == ""}>Clear</ButtonComponent>
+          <ButtonComponent clickEvent={clearFile} disabled={fileInput === ""}>Clear</ButtonComponent>
         </div>
       </div>
       <CustomCanvas url={canvasImage} />
