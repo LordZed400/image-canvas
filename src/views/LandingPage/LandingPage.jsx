@@ -1,6 +1,8 @@
 import React from 'react';
 import { Typography } from '@mui/material';
 
+import FileHandler from '../FileHandler/FileHandler';
+
 import './LandingPage.scss';
 
 const LandingPage = () => {
@@ -15,7 +17,7 @@ const LandingPage = () => {
       </div>
       <div className="content-container">
         <div className="content">
-          <p>Page Content</p>
+          <FileHandler />
         </div>
       </div>
     </div>
