@@ -20,7 +20,10 @@ const FileInput = ({clickEvent, clearEvent, fileInput}) => {
 
   return (
     <div className="file-input-container">
-      <ButtonComponent clickEvent={handleClick}>Upload</ButtonComponent>
+      <ButtonComponent clickEvent={handleClick}>
+        { fileInput != "" && "Replace"}
+        { fileInput == "" && "Upload"}
+      </ButtonComponent>
       <input type="file" className="input-element" ref={hiddenFileInput} value={fileInput} onChange={handleChange}/>
     </div>
   );

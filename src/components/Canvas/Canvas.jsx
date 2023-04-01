@@ -5,6 +5,7 @@ import useImage from 'use-image';
 import './Canvas.scss';
 
 const CanvasComponent = ({url}) => {
+  const windowWidth = window.innerWidth * 0.3;
 
   const LoadImage = () => {
     const [image] = useImage(url);
@@ -13,8 +14,7 @@ const CanvasComponent = ({url}) => {
 
   return (
     <div className="canvas-container">
-      Canvas
-      <Stage width={window.innerWidth} height={window.innerHeight}>
+      <Stage width={windowWidth} height={windowWidth}>
         <Layer>
           <LoadImage />
         </Layer>
