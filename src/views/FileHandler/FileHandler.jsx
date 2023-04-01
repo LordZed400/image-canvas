@@ -38,7 +38,7 @@ const FileHandler = () => {
     setCanvasImage();
   }
 
-  const handleSliderChange = (evemt, newValue) => {
+  const handleSliderChange = (event, newValue) => {
     setStroke(newValue);
   };
 

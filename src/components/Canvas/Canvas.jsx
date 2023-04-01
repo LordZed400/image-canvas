@@ -93,7 +93,7 @@ const CanvasComponent = ({url, strokeWidth, toolType}) => {
                 stroke="#df4b26"
                 strokeWidth={line.width}
                 tension={0.5}
-                opacity={0.5}
+                opacity={line.tool === 'eraser' ? 1 : 0.5}
                 lineCap="round"
                 lineJoin="round"
                 globalCompositeOperation={
