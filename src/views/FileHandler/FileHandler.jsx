@@ -1,10 +1,10 @@
-import { React, useState, useRef } from 'react';
+import { React, useState } from 'react';
 
 import CustomCanvas from '../../components/Canvas/Canvas';
 import ButtonComponent from '../../components/Button/Button';
+import FileInput from '../../components/FileInput/FileInput';
 
 import './FileHandler.scss';
-import FileInput from '../../components/FileInput/FileInput';
 
 const FileHandler = () => {
   const [canvasImage, setCanvasImage] = useState();
