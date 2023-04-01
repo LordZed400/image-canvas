@@ -5,10 +5,10 @@ import useImage from 'use-image';
 import './Canvas.scss';
 import ImageScaleHelper from '../../helpers/ImageScaleHelper';
 
-const CanvasComponent = ({url, strokeWidth}) => {
-  const [tool, setTool] = useState('brush');
+const CanvasComponent = ({url, strokeWidth, toolType}) => {
   const [lines, setLines] = useState([]);
   const isDrawing = useRef(false);
+  const [image] = useImage(url);
 
   useEffect(() => {
     if (!url) {
@@ -19,8 +19,6 @@ const CanvasComponent = ({url, strokeWidth}) => {
   const windowWidth = window.innerWidth * 0.3;
 
   const LoadImage = () => {
-    const [image] = useImage(url);
-
     if (image) {
       const canvasInfo = {
         width: windowWidth,
@@ -44,7 +42,7 @@ const CanvasComponent = ({url, strokeWidth}) => {
     }
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y], width: strokeWidth }]);
+    setLines([...lines, { tool: toolType, points: [pos.x, pos.y], width: strokeWidth }]);
   };
 
   const handleMouseMove = (e) => {
@@ -95,6 +93,7 @@ const CanvasComponent = ({url, strokeWidth}) => {
                 stroke="#df4b26"
                 strokeWidth={line.width}
                 tension={0.5}
+                opacity={line.tool === 'eraser' ? 1 : 0.5}
                 lineCap="round"
                 lineJoin="round"
                 globalCompositeOperation={
