@@ -17,6 +17,9 @@ const CanvasComponent = ({url}) => {
   };
 
   const handleMouseDown = (e) => {
+    if (!url) {
+      return;
+    }
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
     setLines([...lines, { tool, points: [pos.x, pos.y] }]);
