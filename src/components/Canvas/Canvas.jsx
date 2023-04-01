@@ -69,33 +69,38 @@ const CanvasComponent = ({url}) => {
 
   return (
     <div className="canvas-container">
-      <Stage 
-        width={windowWidth}
-        height={windowWidth}
-        onMouseDown={handleMouseDown}
-        onMousemove={handleMouseMove}
-        onMouseup={handleMouseUp}
-        >
-        <Layer>
-          { url && <LoadImage /> }
-        </Layer>
-        <Layer>
-          {lines.map((line, i) => (
-            <Line
-              key={i}
-              points={line.points}
-              stroke="#df4b26"
-              strokeWidth={5}
-              tension={0.5}
-              lineCap="round"
-              lineJoin="round"
-              globalCompositeOperation={
-                line.tool === 'eraser' ? 'destination-out' : 'source-over'
-              }
-            />
-          ))}
-        </Layer>
-      </Stage>
+      <div className="text-container">
+        { !url && "Please upload an Image" }
+      </div>
+      <div className="stage-container">
+        <Stage 
+          width={windowWidth}
+          height={windowWidth}
+          onMouseDown={handleMouseDown}
+          onMousemove={handleMouseMove}
+          onMouseup={handleMouseUp}
+          >
+          <Layer>
+            { url && <LoadImage /> }
+          </Layer>
+          <Layer>
+            {lines.map((line, i) => (
+              <Line
+                key={i}
+                points={line.points}
+                stroke="#df4b26"
+                strokeWidth={5}
+                tension={0.5}
+                lineCap="round"
+                lineJoin="round"
+                globalCompositeOperation={
+                  line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                }
+              />
+            ))}
+          </Layer>
+        </Stage>
+      </div>
     </div>
   );
 }
