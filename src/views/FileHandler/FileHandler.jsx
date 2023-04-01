@@ -1,6 +1,6 @@
 import { React, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
-import { Slider, Stack, Drawer, IconButton, Divider, List, ListItem, ListItemButton, ListItemIcon, ListItemText } from '@mui/material';
+import { Slider, Drawer, IconButton, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ChevronLeft, ChevronRight, Menu, Inbox, Mail } from '@mui/icons-material'
 
 import CustomCanvas from '../../components/Canvas/Canvas';
