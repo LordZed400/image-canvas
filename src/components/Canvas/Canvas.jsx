@@ -69,9 +69,13 @@ const CanvasComponent = ({url, strokeWidth}) => {
 
   return (
     <div className="canvas-container">
-      <div className="text-container">
-        { !url && "Please upload an Image" }
-      </div>
+      { !url && (
+        <div className="text-container">
+          Please upload an Image
+          <br />
+          You can draw on top of the image after adding it
+        </div>
+      )}
       <div className="stage-container">
         <Stage 
           width={windowWidth}
