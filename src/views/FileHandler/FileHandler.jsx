@@ -41,15 +41,10 @@ const FileHandler = () => {
   return (
     <div className="file-handler-container">
       <div className="drawer-button">
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          onClick={handleDrawerToggle}
-          edge="start"
-          className={`drawer-button-icon ${ open && "open" }`}
-        >
-          <Menu />
-        </IconButton>
+        <ButtonComponent clickEvent={handleDrawerToggle} size="medium">
+          { !open && "Open Toolbox"}
+          { open && "Close Toolbox"}
+        </ButtonComponent>
       </div>
       <Drawer
         variant="persistent"
@@ -102,7 +97,7 @@ const FileHandler = () => {
           <FileInput clickEvent={handleFileUpload} clearEvent={clearFile} fileInput={fileInput} />
         </div>
         <div className="clear-btn">
-          <ButtonComponent clickEvent={clearFile} disabled={fileInput === ""}>Clear</ButtonComponent>
+          <ButtonComponent clickEvent={clearFile} disabled={fileInput === ""} size="small">Clear</ButtonComponent>
         </div>
       </div>
       <CustomCanvas url={canvasImage} strokeWidth={stroke} />

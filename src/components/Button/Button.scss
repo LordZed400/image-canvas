@@ -1,7 +1,18 @@
 @import "./../../index.scss";
 
 .button-container {
+
   .button {
-    width: 150px
+    &.button-size-small {
+      width: 150px
+    }
+  
+    &.button-size-medium {
+      width: 200px
+    }
+  
+    &.button-size-large {
+      width: 250px
+    }
   }
 }
