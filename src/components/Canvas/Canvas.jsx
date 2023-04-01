@@ -5,7 +5,7 @@ import useImage from 'use-image';
 import './Canvas.scss';
 import ImageScaleHelper from '../../helpers/ImageScaleHelper';
 
-const CanvasComponent = ({url}) => {
+const CanvasComponent = ({url, strokeWidth}) => {
   const [tool, setTool] = useState('brush');
   const [lines, setLines] = useState([]);
   const isDrawing = useRef(false);
@@ -44,7 +44,7 @@ const CanvasComponent = ({url}) => {
     }
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y] }]);
+    setLines([...lines, { tool, points: [pos.x, pos.y], width: strokeWidth }]);
   };
 
   const handleMouseMove = (e) => {
@@ -89,7 +89,7 @@ const CanvasComponent = ({url}) => {
                 key={i}
                 points={line.points}
                 stroke="#df4b26"
-                strokeWidth={5}
+                strokeWidth={line.width}
                 tension={0.5}
                 lineCap="round"
                 lineJoin="round"
