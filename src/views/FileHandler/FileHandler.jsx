@@ -1,7 +1,7 @@
 import { React, useState } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Slider, Drawer, IconButton, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { ChevronLeft, ChevronRight, Menu, Inbox, Mail } from '@mui/icons-material'
+import { ChevronLeft, ChevronRight, Inbox, Mail } from '@mui/icons-material'
 
 import CustomCanvas from '../../components/Canvas/Canvas';
 import ButtonComponent from '../../components/Button/Button';
