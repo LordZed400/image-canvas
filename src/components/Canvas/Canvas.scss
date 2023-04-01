@@ -1,8 +1,18 @@
 @import "./../../index.scss";
 
 .canvas-container {
-  background-color: $white;
-  border: 2px solid $gray-chateau;
+  align-items: center;
+  background-color: $gallery;
+  border: 2px dashed $gray-chateau;
   border-radius: 5px;
+  display: flex;
+  justify-content: center;
   margin-top: 15px;
+
+  .text-container {
+    color: $davys-grey;
+    font-family: "RobotoLight";
+    position: absolute;
+    text-align: center;
+  }
 }

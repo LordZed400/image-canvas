@@ -29,4 +29,69 @@
       }
     }
   }
+
+  .drawer-button {
+    
+    &.open {
+      display: none;
+    }
+  }
+
+  .drawer-container {
+    width: 300px;
+    flex-shrink: 0;
+
+    & .MuiDrawer-paper {
+      width: 300px;
+      box-sizing: "border-box"
+    }
+
+    .drawer-header {
+      display: flex;
+      height: 100px;
+      justify-content: space-between;
+      padding: 0 15px 0 20px;
+
+      .drawer-icon {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+  
+      .drawer-text {
+        align-self: center;
+        font-family: "Lobster";
+        font-size: 25px;
+      }
+    }
+
+    .drawer-list-item {
+      
+      &:hover {
+        cursor: pointer;
+      }
+
+      .drawer-list-stack {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+
+        .min-value {
+          font-size: 20px;
+          padding-right: 15px;
+        }
+
+        .max-value {
+          font-size: 20px;
+          padding-left: 15px;
+        }
+        
+      }
+
+      .drawer-list-label {
+        font-family: "RobotoBold";
+        margin-right: 10px;
+      }
+    }
+  }
 }

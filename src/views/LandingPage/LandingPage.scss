@@ -1,7 +1,7 @@
 @import "./../../index.scss";
 
 .landing-page-container {
-  background: $mercury;
+  background: $wild-sand;
 
   .title-container {
     align-items: center;
@@ -24,6 +24,11 @@
       display: inline-block;
       font-family: "Lobster";
       padding: 0 15px;
+    }
+
+    .drawer-button {
+      position: absolute;
+      left: 25px;
     }
   }
 
