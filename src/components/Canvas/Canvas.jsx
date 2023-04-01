@@ -1,4 +1,4 @@
-import { React, useState, useRef } from 'react';
+import { React, useState, useEffect, useRef } from 'react';
 import { Stage, Layer, Image, Line } from 'react-konva';
 import useImage from 'use-image';
 
@@ -8,6 +8,12 @@ const CanvasComponent = ({url}) => {
   const [tool, setTool] = useState('brush');
   const [lines, setLines] = useState([]);
   const isDrawing = useRef(false);
+
+  useEffect(() => {
+    if (!url) {
+      setLines([]);
+    }
+  }, [url]);
 
   const windowWidth = window.innerWidth * 0.3;
 
