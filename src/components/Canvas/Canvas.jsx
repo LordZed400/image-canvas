@@ -8,6 +8,7 @@ import ImageScaleHelper from "../../helpers/ImageScaleHelper";
 
 const CanvasComponent = ({ url, strokeWidth, toolType }) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [enableCursor, setEnableCursor] = useState(false);
   const [lines, setLines] = useState([]);
   const isDrawing = useRef(false);
   const [image] = useImage(url);
@@ -55,8 +56,8 @@ const CanvasComponent = ({ url, strokeWidth, toolType }) => {
           y={scaleInfo.y}
           width={scaleInfo.width}
           height={scaleInfo.height}
-          filters={[Konva.Filters.Pixelate]}
-          pixelSize={10}
+          // filters={[Konva.Filters.Pixelate]}
+          // pixelSize={10}
         />
       );
     }
@@ -83,8 +84,7 @@ const CanvasComponent = ({ url, strokeWidth, toolType }) => {
   };
 
   const handleMouseMove = (e) => {
-    // no drawing - skipping
-    if (!isDrawing.current) {
+    if (!url) {
       return;
     }
     const stage = e.target.getStage();
@@ -93,16 +93,30 @@ const CanvasComponent = ({ url, strokeWidth, toolType }) => {
       x: mousePosition.x,
       y: mousePosition.y,
     });
-    let lastLine = lines[lines.length - 1];
+    // no drawing - skipping
+    if (!isDrawing.current) {
+      return;
+    }
+    
+    // let lastLine = lines[lines.length - 1];
     // add point
-    lastLine.points = lastLine.points.concat([
-      mousePosition.x,
-      mousePosition.y,
-    ]);
+    // lastLine.points = lastLine.points.concat([
+    //   mousePosition.x,
+    //   mousePosition.y,
+    // ]);
 
     // replace last
-    lines.splice(lines.length - 1, 1, lastLine);
-    setLines(lines.concat());
+    // lines.splice(lines.length - 1, 1, lastLine);
+    // setLines(lines.concat());
+
+    setLines([
+      ...lines,
+      {
+        tool: toolType,
+        points: [mousePosition.x, mousePosition.y],
+        width: strokeWidth,
+      },
+    ]);
   };
 
   const handleMouseUp = () => {
@@ -125,19 +139,25 @@ const CanvasComponent = ({ url, strokeWidth, toolType }) => {
           onMouseDown={handleMouseDown}
           onMousemove={handleMouseMove}
           onMouseup={handleMouseUp}
+          onMouseEnter={() => { setEnableCursor(true) }}
+          onMouseLeave={() => { setEnableCursor(false) }}
         >
           <Layer>{url && <LoadImage />}</Layer>
           <Layer>
             {lines.map((line, i) => (
-              <Line
+              <Circle
                 key={i}
-                points={line.points}
+                // points={line.points}
+                x={line.points.x}
+                y={line.points.y}
+                radius={line.width}
+                fill="#df4b26"
                 stroke="#df4b26"
                 strokeWidth={line.width}
-                tension={0.5}
-                opacity={line.tool === "eraser" ? 1 : 0.5}
-                lineCap="round"
-                lineJoin="round"
+                // tension={0.5}
+                // opacity={line.tool === "eraser" ? 1 : 0.5}
+                // lineCap="round"
+                // lineJoin="round"
                 globalCompositeOperation={
                   line.tool === "eraser" ? "destination-out" : "source-over"
                 }
@@ -148,8 +168,10 @@ const CanvasComponent = ({ url, strokeWidth, toolType }) => {
             <Circle
               x={mousePos.x}
               y={mousePos.y}
-              radius={strokeWidth}
-              strokeWidth={0}
+              radius={url && enableCursor ? strokeWidth : 0}
+              stroke="#df4b26"
+              strokeWidth={10}
+              fill="#df4b26"
               filters={[Konva.Filters.Pixelate]}
               pixelSize={10}
             />
