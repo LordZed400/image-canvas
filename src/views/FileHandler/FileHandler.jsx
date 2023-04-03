@@ -11,10 +11,11 @@ import './FileHandler.scss';
 
 const FileHandler = () => {
   const [canvasImage, setCanvasImage] = useState();
+  const [clearCanvasTrigger, setClearCanvasTrigger] = useState(0);
   const [file, setFile] = useState();
   const [fileInput, setFileInput] = useState("");
   const [stroke, setStroke] = useState(5);
-  const [tool, setTool] = useState("pen");
+  const [tool, setTool] = useState("brush");
   const theme = useTheme();
   const [open, setOpen] = useState(false);
 
@@ -36,6 +37,10 @@ const FileHandler = () => {
     setFileInput("");
     setFile();
     setCanvasImage();
+  }
+
+  const clearCanvas = () => {
+    setClearCanvasTrigger((clearCanvasTrigger + 1 ) % 2);
   }
 
   const handleSliderChange = (event, newValue) => {
@@ -105,12 +110,22 @@ const FileHandler = () => {
           </List>
           <List className='drawer-list drawer-list-tool'>
             <ListItem className='drawer-list-item'>
-              <span className="drawer-list-label">Tool type: </span> { tool === "pen" ? "Brush" : "Eraser" }
+              <span className="drawer-list-label">Tool type: </span> { tool.charAt(0).toUpperCase() + tool.substring(1) }
             </ListItem>
             <ListItem className='drawer-list-item'>
               <div className='drawer-list-stack'>
                 <div className="drawer-list-stack-item">
-                  <ButtonComponent clickEvent={() => { setTool("pen") }}>Brush</ButtonComponent>
+                  <ButtonComponent clickEvent={() => { setTool("brush") }}>Brush</ButtonComponent>
+                </div>
+                <div className="drawer-list-stack-item">
+                  <ButtonComponent clickEvent={() => { setTool("lasso") }}>Lasso</ButtonComponent>
+                </div>
+              </div>
+            </ListItem>
+            <ListItem className='drawer-list-item'>
+              <div className='drawer-list-stack'>
+                <div className="drawer-list-stack-item">
+                  <ButtonComponent clickEvent={() => { setTool("path") }}>Path</ButtonComponent>
                 </div>
                 <div className="drawer-list-stack-item">
                   <ButtonComponent clickEvent={() => { setTool("eraser") }}>Eraser</ButtonComponent>
@@ -136,10 +151,13 @@ const FileHandler = () => {
           <FileInput clickEvent={handleFileUpload} clearEvent={clearFile} fileInput={fileInput} />
         </div>
         <div className="clear-btn">
-          <ButtonComponent clickEvent={clearFile} disabled={fileInput === ""} size="small">Clear</ButtonComponent>
+          <ButtonComponent clickEvent={clearCanvas} disabled={fileInput === ""} size="small">Clear Canvas</ButtonComponent>  
+        </div>
+        <div className="remove-btn">
+          <ButtonComponent clickEvent={clearFile} disabled={fileInput === ""} size="small">Remove File</ButtonComponent>
         </div>
       </div>
-      <CustomCanvas url={canvasImage} strokeWidth={stroke} toolType={tool}/>
+      <CustomCanvas url={canvasImage} clearCanvas={clearCanvasTrigger} strokeWidth={stroke} toolType={tool}/>
     </div>
   );
 }
