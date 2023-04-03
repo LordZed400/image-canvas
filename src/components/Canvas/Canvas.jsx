@@ -280,8 +280,8 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
           onMouseDown={handleMouseDown}
           onMousemove={handleMouseMove}
           onMouseup={handleMouseUp}
-          onMouseEnter={() => { setEnableCursor(true); setStageInfo({...stageInfo, ...{ draggable: false}}); console.log("Enter") }}
-          onMouseLeave={() => { setEnableCursor(false); setStageInfo({...stageInfo, ...{ draggable: true}}); console.log("Left") }}
+          onMouseEnter={() => { setEnableCursor(true); setStageInfo({...stageInfo, ...{ draggable: false}})}}
+          onMouseLeave={() => { setEnableCursor(false); setStageInfo({...stageInfo, ...{ draggable: true}})}}
           onWheel={handleWheel}
         >
           <Layer>{url && <LoadImage />}</Layer>
