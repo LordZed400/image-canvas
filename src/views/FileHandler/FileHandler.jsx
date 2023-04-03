@@ -15,7 +15,7 @@ const FileHandler = () => {
   const [file, setFile] = useState();
   const [fileInput, setFileInput] = useState("");
   const [stroke, setStroke] = useState(5);
-  const [tool, setTool] = useState("pen");
+  const [tool, setTool] = useState("brush");
   const theme = useTheme();
   const [open, setOpen] = useState(false);
 

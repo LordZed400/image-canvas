@@ -1,6 +1,6 @@
 import { React, useState, useEffect, useRef } from "react";
 import Konva from "konva";
-import { Stage, Layer, Image, Line, Circle, Path } from "react-konva";
+import { Stage, Layer, Image, Line, Circle, Path, Group } from "react-konva";
 import useImage from "use-image";
 
 import "./Canvas.scss";
@@ -89,6 +89,10 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       case "path":
         setupPathInfo(true);
         break;
+      case "eraser":
+        setupLassoInfo(true);
+        setupBrushInfo(true);
+        break;
       default:
         setupBrushInfo(true);
         break;
@@ -117,6 +121,10 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       case "path":
         setupPathInfo(false);
         break;
+      case "eraser":
+        setupLassoInfo(false);
+        setupBrushInfo(false);
+        break;
       default:
         setupBrushInfo(false);
         break;
@@ -138,16 +146,29 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
             width: strokeWidth,
           },
         ]);
+        return;
+      } else if(toolType === "eraser") {
+        if (lasso.length !== 2) {
+          setLasso([
+            ...lasso,
+            {
+              tool: toolType,
+              points: [mousePos.x, mousePos.y],
+              width: strokeWidth,
+            },
+          ]);
+        }
+        return;
       }
-      return;
     }
-    let lastLasso = lasso[lasso.length - 1];
+    const pointIndex = toolType === "eraser" ? 1 : 0;
+    let lastLasso = lasso[pointIndex];
     lastLasso.points = lastLasso.points.concat([
       mousePos.x,
       mousePos.y,
     ]);
 
-    lasso.splice(lasso.length - 1, 1, lastLasso);
+    lasso.splice(pointIndex, 1, lastLasso);
     setLasso(lasso.concat());
   };
 
@@ -163,11 +184,12 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       ]);
       return;
     }
-    let lastPath = path[path.length - 1];
-    lastPath.points = lastPath.points.concat({
+    const newPoints = {
       x: mousePos.x,
       y: mousePos.y,
-    });
+    };
+    let lastPath = path[path.length - 1];
+    lastPath.points = lastPath.points.concat(newPoints);
 
     path.splice(path.length - 1, 1, lastPath);
     setPath(path.concat());
@@ -185,11 +207,12 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       ]);
       return;
     }
-    let lastBrush = brush[brush.length - 1];
-    lastBrush.points = lastBrush.points.concat([
+    const newPoints = [
       mousePos.x,
       mousePos.y,
-    ]);
+    ];
+    let lastBrush = brush[brush.length - 1];
+    lastBrush.points = lastBrush.points.concat(newPoints);
 
     // replace last
     brush.splice(brush.length - 1, 1, lastBrush);
@@ -247,7 +270,6 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
 };
 
 const CreateShape = (value) => {
-  // debugger;
   const svgPath = value.line.points.reduce(
     (path, point, index) =>
       `${path}${index === 0 ? "M" : "L"}${point.x},${point.y}`,
@@ -255,33 +277,36 @@ const CreateShape = (value) => {
   );
 
   return (
-    <Path
-      x={value.line.points.x}
-      y={value.line.points.y}
-      data={svgPath}
-      fill="#df4b26"
-      opacity={value.line.tool === "eraser" ? 1 : 0.5}
-      globalCompositeOperation={
-        value.line.tool === "eraser" ? "destination-out" : "source-over"
-      }
-    />
+    <Group>
+      <Path
+        x={value.line.points.x}
+        y={value.line.points.y}
+        data={svgPath}
+        fill="#df4b26"
+        opacity={value.line.tool === "eraser" ? 1 : 0.5}
+        globalCompositeOperation={
+          value.line.tool === "eraser" ? "destination-out" : "source-over"
+        }
+      />
+    </Group>
   );
 }
 
 const CreateLines = (value) => {
   return (
-    <Line
-      points={value.line.points}
-      stroke="#df4b26"
-      strokeWidth={value.line.width * 2}
-      opacity={value.line.tool === "eraser" ? 1 : 0.5}
-      lineCap="round"
-      lineJoin="round"
-      globalCompositeOperation={
-        value.line.tool === "eraser" ? "destination-out" : "source-over"
-      }
-    />
+    <Group>
+      <Line
+        points={value.line.points}
+        stroke="#df4b26"
+        strokeWidth={value.line.width * 2}
+        opacity={value.line.tool === "eraser" ? 1 : 0.5}
+        lineCap="round"
+        lineJoin="round"
+        globalCompositeOperation={
+          value.line.tool === "eraser" ? "destination-out" : "source-over"
+        }
+      />
+    </Group>
   );
 }
-
 export default CanvasComponent;
