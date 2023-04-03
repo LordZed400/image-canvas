@@ -1,6 +1,15 @@
 import { React, useState, useEffect, useRef } from "react";
 import Konva from "konva";
-import { Stage, Layer, Image, Line, Circle, Path, Group, Rect } from "react-konva";
+import {
+  Stage,
+  Layer,
+  Image,
+  Line,
+  Circle,
+  Path,
+  Group,
+  Rect,
+} from "react-konva";
 import useImage from "use-image";
 import { Button, Divider, Tooltip, tooltipClasses } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -36,10 +45,11 @@ const CanvasComponent = ({
   const [lasso, setLasso] = useState([]);
   const [path, setPath] = useState([]);
   const [polygon, setPolygon] = useState([]);
+  const [eraser, setEraser] = useState([]);
   const [guides, setGuides] = useState({
     rect: [],
     lines: [],
-    complete: false
+    complete: false,
   });
   const isDrawing = useRef(false);
   const [image] = useImage(url);
@@ -60,12 +70,15 @@ const CanvasComponent = ({
       stageY: 0,
       draggable: false,
     });
-  }
+  };
 
   const handleWheel = (e) => {
     e.evt.preventDefault();
     // TODO: fix the broken mousePosition after scaling
-    setStageInfo({ ...ImageScaleHelper.calculateStageZoom(e.target, e.evt.deltaY), ...{draggable: stageInfo.draggable}});
+    setStageInfo({
+      ...ImageScaleHelper.calculateStageZoom(e.target, e.evt.deltaY),
+      ...{ draggable: stageInfo.draggable },
+    });
   };
 
   useEffect(() => {
@@ -74,6 +87,7 @@ const CanvasComponent = ({
       setLasso([]);
       setPath([]);
       setPolygon([]);
+      setEraser([]);
     }
   }, [url]);
 
@@ -93,6 +107,7 @@ const CanvasComponent = ({
     setLasso([]);
     setPath([]);
     setPolygon([]);
+    setEraser([]);
   };
 
   const LoadImage = () => {
@@ -132,7 +147,6 @@ const CanvasComponent = ({
     if (stageInfo.draggable) {
       document.body.style.cursor = "grabbing";
     }
-
     if (!url || stageInfo.draggable) {
       return;
     }
@@ -154,9 +168,7 @@ const CanvasComponent = ({
         setupLassoInfo(true);
         break;
       case "eraser":
-        setupPathInfo(true, true);
-        setupBrushInfo(true, true);
-        setupPolygonInfo(true, true);
+        setupEraserInfo(true);
         break;
       default:
         setupBrushInfo(true);
@@ -190,9 +202,7 @@ const CanvasComponent = ({
         setupLassoInfo(false);
         break;
       case "eraser":
-        setupPathInfo(false, true);
-        setupBrushInfo(false, true);
-        setupPolygonInfo(false, true);
+        setupEraserInfo(false);
         break;
       default:
         setupBrushInfo(false);
@@ -207,16 +217,27 @@ const CanvasComponent = ({
     isDrawing.current = false;
   };
 
-  const setupBrushInfo = (initial, eraser) => {
-    const brushInfo = CanvasHelper.setupBrushInfo(initial, eraser, strokeWidth, brush, mousePos);
+  const setupBrushInfo = (initial) => {
+    const brushInfo = CanvasHelper.setupBrushInfo(
+      initial,
+      false,
+      strokeWidth,
+      brush,
+      mousePos
+    );
     if (!brushInfo) {
       return;
     }
     setBrush(brushInfo);
   };
 
-  const setupPathInfo = (initial, eraser) => {
-    const pathInfo = CanvasHelper.setupPathInfo(initial, eraser, strokeWidth, path, mousePos);
+  const setupPathInfo = (initial) => {
+    const pathInfo = CanvasHelper.setupPathInfo(
+      initial,
+      strokeWidth,
+      path,
+      mousePos
+    );
     if (!pathInfo) {
       return;
     }
@@ -224,21 +245,46 @@ const CanvasComponent = ({
   };
 
   const setupLassoInfo = (initial) => {
-    const lassoInfo = CanvasHelper.setupLassoInfo(initial, strokeWidth, lasso, mousePos);
+    const lassoInfo = CanvasHelper.setupLassoInfo(
+      initial,
+      strokeWidth,
+      lasso,
+      mousePos
+    );
     if (!lassoInfo) {
       return;
     }
     setLasso(lassoInfo);
   };
 
-  const setupPolygonInfo = (initial, eraser) => {
-    const polygonInfo = CanvasHelper.setupPolygonInfo(initial, eraser, guides, polygon, mousePos, strokeWidth);
+  const setupPolygonInfo = (initial) => {
+    const polygonInfo = CanvasHelper.setupPolygonInfo(
+      initial,
+      guides,
+      polygon,
+      mousePos,
+      strokeWidth
+    );
     if (!polygonInfo) {
       return;
     }
     setGuides(polygonInfo.guideSet);
     setPolygon(polygonInfo.polygonSet);
-  }
+  };
+
+  const setupEraserInfo = (initial) => {
+    const eraserInfo = CanvasHelper.setupBrushInfo(
+      initial,
+      true,
+      strokeWidth,
+      eraser,
+      mousePos
+    );
+    if (!eraserInfo) {
+      return;
+    }
+    setEraser(eraserInfo);
+  };
 
   return (
     <div className={`canvas-container ${!url ? "empty-canvas" : ""}`}>
@@ -313,19 +359,25 @@ const CanvasComponent = ({
               {polygon.map((data, i) => (
                 <CreatePolygons key={i} line={data} />
               ))}
+              {eraser.map((data, i) => (
+                <CreateLines key={i} line={data} />
+              ))}
             </Layer>
             <Layer>
-              {url && enableCursor && toolType !== "polygon" && !stageInfo.draggable && (
-                <Circle
-                  x={mousePos.x}
-                  y={mousePos.y}
-                  radius={strokeWidth}
-                  fill="#df4b26"
-                  opacity={0.5}
-                  filters={[Konva.Filters.Pixelate]}
-                  pixelSize={10}
-                />
-              )}
+              {url &&
+                enableCursor &&
+                toolType !== "polygon" &&
+                !stageInfo.draggable && (
+                  <Circle
+                    x={mousePos.x}
+                    y={mousePos.y}
+                    radius={strokeWidth}
+                    fill="#df4b26"
+                    opacity={0.5}
+                    filters={[Konva.Filters.Pixelate]}
+                    pixelSize={10}
+                  />
+                )}
             </Layer>
             <Layer>
               {guides.lines.map((line, i) => (
@@ -456,7 +508,10 @@ const CanvasComponent = ({
               className="remove-tool"
               variant="text"
               disabled={url === ""}
-              onClick={() => { clearFile(); resetStageInfo(); }}
+              onClick={() => {
+                clearFile();
+                resetStageInfo();
+              }}
             >
               <img
                 className="action-img"
@@ -468,20 +523,31 @@ const CanvasComponent = ({
           <Divider orientation="vertical" flexItem />
           <CustomWidthTooltip title="Pan" arrow>
             <Button
-              className={`action-tool pan-tool ${stageInfo.draggable ? 'active' : ''}`}
+              className={`action-tool pan-tool ${
+                stageInfo.draggable ? "active" : ""
+              }`}
               variant="text"
-              onClick={() => setStageInfo({ ...stageInfo, ...{ draggable: !stageInfo.draggable } })}
+              onClick={() =>
+                setStageInfo({
+                  ...stageInfo,
+                  ...{ draggable: !stageInfo.draggable },
+                })
+              }
             >
               <img className="action-img" src={brushTools.pan} alt="pan-tool" />
             </Button>
           </CustomWidthTooltip>
           <CustomWidthTooltip title="Center Image" arrow>
             <Button
-              className={`action-tool zoom-tool`}
+              className="action-tool zoom-tool"
               variant="text"
               onClick={() => resetStageInfo()}
             >
-              <img className="action-img" src={brushTools.zoom} alt="zoom-tool" />
+              <img
+                className="action-img"
+                src={brushTools.zoom}
+                alt="zoom-tool"
+              />
             </Button>
           </CustomWidthTooltip>
         </div>
@@ -504,10 +570,7 @@ const CreateShape = (value) => {
         y={value.line.points.y}
         data={svgPath}
         fill="#df4b26"
-        opacity={value.line.tool === "eraser" ? 1 : 0.5}
-        globalCompositeOperation={
-          value.line.tool === "eraser" ? "destination-out" : "source-over"
-        }
+        opacity={0.5}
       />
     </Group>
   );
@@ -538,12 +601,9 @@ const CreatePolygons = (value) => {
         points={value.line.points}
         fill="#df4b26"
         stroke="#df4b26"
-        strokeWidth={value.line.tool === "eraser" ? value.line.width * 2 : 0}
-        opacity={value.line.tool === "eraser" ? 1 : 0.5}
-        closed={value.line.tool === "eraser" ? false : true} 
-        globalCompositeOperation={
-          value.line.tool === "eraser" ? "destination-out" : "source-over"
-        }
+        strokeWidth={0}
+        opacity={0.5}
+        closed={true}
       />
     </Group>
   );

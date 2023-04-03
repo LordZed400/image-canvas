@@ -8,9 +8,6 @@ class CanvasHelper {
   };
 
   static setupBrushInfo = (initial, eraser, strokeWidth, brush, mousePos) => {
-    if (eraser && brush.length === 0) {
-      return;
-    }
     if (initial) {
       return([
         ...brush,
@@ -30,12 +27,9 @@ class CanvasHelper {
     return(brush.concat());
   };
 
-  static setupPathInfo = (initial, eraser, strokeWidth, path, mousePos) => {
-    if (eraser && path.length === 0) {
-      return;
-    }
+  static setupPathInfo = (initial, strokeWidth, path, mousePos) => {
     if (initial) {
-      if (!eraser && (path.length === 0 || !path.map(e => e.width).includes(strokeWidth))) {
+      if (path.length === 0 || !path.map(e => e.width).includes(strokeWidth)) {
         return([
           ...path,
           {
@@ -44,24 +38,10 @@ class CanvasHelper {
             width: strokeWidth,
           },
         ]);
-      } else if (eraser) {
-        return([
-          ...path,
-          {
-            tool: "eraser",
-            points: [mousePos.x, mousePos.y],
-            width: strokeWidth,
-          },
-        ]);
       }
     }
     const newPoints = [mousePos.x, mousePos.y];
-    var pointIndex;
-    if (eraser) {
-      pointIndex = path.length - 1
-    } else {
-      pointIndex = path.findIndex(e => e.tool === "path" && e.width === strokeWidth);
-    }
+    var pointIndex = path.findIndex(e => e.tool === "path" && e.width === strokeWidth);
     let lastPath = path.at(pointIndex);
     
     lastPath.points = lastPath.points.concat(newPoints);
@@ -92,24 +72,11 @@ class CanvasHelper {
     return(lasso.concat());
   };
 
-  static setupPolygonInfo = (initial, eraser, guides, polygon, mousePos, strokeWidth) => {
+  static setupPolygonInfo = (initial, guides, polygon, mousePos, strokeWidth) => {
     if (!initial && !guides.rect.length) {
       return;
     }
     if (initial) {
-      if (eraser) {
-        return({
-          guideSet: guides,
-          polygonSet: [
-            ...polygon,
-            {
-              tool: "eraser",
-              points: [mousePos.x, mousePos.y, mousePos.x + 0.00000001, mousePos.y + 0.00000001],
-              width: strokeWidth,
-            }
-          ]
-        });
-      }
       if (guides.complete) {
         const polygonSet = ([
           ...polygon,
@@ -136,18 +103,6 @@ class CanvasHelper {
           conplete: guides.complete
         },
         polygonSet: polygon
-      });
-    }
-
-    if (eraser) {
-      const newPoints = [mousePos.x, mousePos.y];
-      var pointIndex = polygon.length - 1
-      let lastPoint = polygon.at(pointIndex);
-      lastPoint.points = lastPoint.points.concat(newPoints);
-      polygon.splice(pointIndex, 1, lastPoint);
-      return({
-        guideSet: guides,
-        polygonSet: polygon.concat()
       });
     }
 
