@@ -2,12 +2,15 @@
 
 .canvas-container {
   align-items: center;
-  background-color: $white;
+  background-color: $zircon;
   border: 2px dashed $iron;
   border-radius: 5px;
   display: flex;
   justify-content: center;
-  margin-top: 15px;
+
+  &.empty-canvas {
+    background-color: $white;
+  }
 
   .upload-container {
     align-items: center;
@@ -25,10 +28,6 @@
     }
   }
 
-  .stage-container {
-    cursor: crosshair;
-  }
-
   .toolbox-container {
     left: 325px;
     position: absolute;
@@ -41,13 +40,19 @@
       display: flex;
       padding: 10px 20px;
 
+      .toolbox-tool {
+        &.active {
+          background-color: $tropical-blue;
+        }
+      }
+
       .brush-img {
         width: 40px;
         height: 40px;
       }
     }
   }
-  
+
   .action-container {
     position: absolute;
     right: 25px;
@@ -59,6 +64,12 @@
       box-shadow: 0px 8px 24px rgba(0, 53, 133, 0.1);
       display: flex;
       padding: 10px 20px;
+
+      .action-tool {
+        &.active {
+          background-color: $tropical-blue;
+        }
+      }
 
       .action-img {
         width: 40px;

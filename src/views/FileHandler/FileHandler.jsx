@@ -6,10 +6,8 @@ import {
   Divider,
   List,
   ListItem,
-  ListItemIcon,
-  ListItemText,
 } from "@mui/material";
-import { Close, Inbox, Mail } from "@mui/icons-material";
+import { Close } from "@mui/icons-material";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
@@ -115,24 +113,8 @@ const FileHandler = () => {
               </div>
             </ListItem>
           </List>
-          <List className="drawer-list drawer-list-tool">
-            <ListItem className="drawer-list-item">
-              <span className="drawer-list-label">Tool type: </span>{" "}
-              {tool.charAt(0).toUpperCase() + tool.substring(1)}
-            </ListItem>
-          </List>
           <Divider />
         </div>
-        <List className="drawer-list">
-          {["Stroke", "Zoom", "Brush"].map((text, index) => (
-            <ListItem key={text} className="drawer-list-item">
-              <ListItemIcon>
-                {index % 2 === 0 ? <Inbox /> : <Mail />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
       </Drawer>
       <CustomCanvas
         url={canvasImage}
