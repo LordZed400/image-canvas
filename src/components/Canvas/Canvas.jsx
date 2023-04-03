@@ -75,7 +75,6 @@ const CanvasComponent = ({
   }, [image]);
 
   const windowWidth = window.innerWidth;
-  const windowHeight = window.innerHeight - 200;
 
   const clearCanvas = () => {
     setBrush([]);

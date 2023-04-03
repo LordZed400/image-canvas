@@ -14,8 +14,6 @@ import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 import CustomCanvas from "../../components/Canvas/Canvas";
-import ButtonComponent from "../../components/Button/Button";
-import FileInput from "../../components/FileInput/FileInput";
 
 import "./FileHandler.scss";
 import CanvasHelper from "../../helpers/CanvasHelper";
@@ -26,7 +24,6 @@ const FileHandler = () => {
   const [fileInput, setFileInput] = useState("");
   const [stroke, setStroke] = useState(5);
   const [tool, setTool] = useState("brush");
-  const [open, setOpen] = useState(false);
   const location = useLocation();
 
   const navigate = useNavigate();
@@ -67,7 +64,6 @@ const FileHandler = () => {
         variant="permanent"
         anchor="left"
         className="drawer-container"
-        open={open}
       >
         <div className="drawer-header">
           <div className="drawer-text">Information</div>
