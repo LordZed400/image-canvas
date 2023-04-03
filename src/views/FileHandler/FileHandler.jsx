@@ -1,14 +1,15 @@
 import { React, useState, useEffect } from 'react';
-import { useTheme } from '@mui/material/styles';
 import { Slider, Drawer, IconButton, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
-import { ChevronLeft, ChevronRight, Inbox, Mail } from '@mui/icons-material'
+import { Close, Inbox, Mail } from '@mui/icons-material'
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 import CustomCanvas from '../../components/Canvas/Canvas';
 import ButtonComponent from '../../components/Button/Button';
 import FileInput from '../../components/FileInput/FileInput';
 
 import './FileHandler.scss';
+import CanvasHelper from '../../helpers/CanvasHelper';
 
 const FileHandler = () => {
   const [canvasImage, setCanvasImage] = useState();
@@ -17,9 +18,10 @@ const FileHandler = () => {
   const [fileInput, setFileInput] = useState("");
   const [stroke, setStroke] = useState(5);
   const [tool, setTool] = useState("brush");
-  const theme = useTheme();
   const [open, setOpen] = useState(false);
   const location = useLocation();
+
+  const navigate = useNavigate();
   
   useEffect(() => {
     if (location.state) {
@@ -27,12 +29,8 @@ const FileHandler = () => {
     }
   }, [location.state]);
 
-  const handleDrawerToggle = () => {
-    setOpen(!open);
-  }
-
-  const handleDrawerClose = () => {
-    setOpen(false);
+  const navigateToHome = () => {
+    navigate("/");
   };
   
   const handleFileUpload = (inputValue) => {
@@ -57,14 +55,8 @@ const FileHandler = () => {
 
   return (
     <div className="file-handler-container">
-      <div className="drawer-button">
-        <ButtonComponent clickEvent={handleDrawerToggle} size="medium">
-          { !open && "Open Toolbox"}
-          { open && "Close Toolbox"}
-        </ButtonComponent>
-      </div>
       <Drawer
-        variant="persistent"
+        variant="permanent"
         anchor="left"
         className="drawer-container"
         open={open}
@@ -74,14 +66,14 @@ const FileHandler = () => {
             Information
           </div>
           <div className="drawer-icon">
-            <IconButton onClick={() => handleDrawerClose()}>
-              {theme.direction === 'ltr' ? <ChevronLeft /> : <ChevronRight />}
+            <IconButton onClick={() => navigateToHome()}>
+              <Close />
             </IconButton>
           </div>
         </div>
         <Divider />
         {
-          canvasImage && file && (
+          canvasImage && (
             <div className="drawer-item-details-container">
               <List className='drawer-list'>
                 <ListItem className='drawer-list-item'>
@@ -90,7 +82,7 @@ const FileHandler = () => {
                 <ListItem className='drawer-list-item'>
                   <div className='drawer-list-stack vertical-stack'>
                     <div className="drawer-list-stack-item">
-                      Name: { file.name }
+                      Name: { file ? file.name : CanvasHelper.getStaticFilename(canvasImage) }
                     </div>
                   </div>
                 </ListItem>
