@@ -276,7 +276,7 @@ const CanvasComponent = ({
               ))}
             </Layer>
             <Layer>
-              {url && enableCursor && (
+              {url && enableCursor && !stageInfo.draggable && (
                 <Circle
                   x={mousePos.x}
                   y={mousePos.y}
