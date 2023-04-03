@@ -16,6 +16,36 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
   const [image] = useImage(url);
   const imageRef = useRef();
 
+  const [stageInfo, setStageInfo] = useState({
+    stageScale: 1,
+    stageX: 0,
+    stageY: 0,
+    draggable: false
+  });
+  
+  const handleWheel = (e) => {
+    e.evt.preventDefault();
+
+    const scaleBy = 1.02;
+    const stage = e.target.getStage();
+    const oldScale = stage.scaleX();
+    const mousePointTo = {
+      x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+      y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
+    };
+
+    const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+    setStageInfo({
+      stageScale: newScale,
+      stageX:
+        -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+      stageY:
+        -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
+      draggable: stageInfo.draggable
+    });
+  };
+
   useEffect(() => {
     if (!url) {
       setBrush([]);
@@ -38,13 +68,14 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
     }
   }, [image]);
 
-  const windowWidth = window.innerWidth * 0.3;
+  const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight - 200;
 
   const LoadImage = () => {
     if (image) {
       const canvasInfo = {
-        width: windowWidth,
-        height: windowWidth,
+        width: windowWidth * 0.3,
+        height: windowWidth * 0.3,
       };
 
       const imageInfo = {
@@ -62,6 +93,10 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
         <Image
           ref={imageRef}
           image={image}
+          // x={windowWidth / 2}
+          // y={windowHeight / 2}
+          // width={scaleInfo.width}
+          // height={scaleInfo.height}
           x={scaleInfo.x}
           y={scaleInfo.y}
           width={scaleInfo.width}
@@ -230,13 +265,18 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       )}
       <div className="stage-container">
         <Stage
-          width={windowWidth}
-          height={windowWidth}
+          width={windowWidth * 0.3}
+          height={windowWidth * 0.3}
+          scaleX={stageInfo.stageScale}
+          scaleY={stageInfo.stageScale}
+          x={stageInfo.stageX}
+          y={stageInfo.stageY}
           onMouseDown={handleMouseDown}
           onMousemove={handleMouseMove}
           onMouseup={handleMouseUp}
-          onMouseEnter={() => { setEnableCursor(true) }}
-          onMouseLeave={() => { setEnableCursor(false) }}
+          onMouseEnter={() => { setEnableCursor(true); setStageInfo({...stageInfo, ...{ draggable: false}}); console.log("Enter") }}
+          onMouseLeave={() => { setEnableCursor(false); setStageInfo({...stageInfo, ...{ draggable: true}}); console.log("Left") }}
+          onWheel={handleWheel}
         >
           <Layer>{url && <LoadImage />}</Layer>
           <Layer>
@@ -251,17 +291,21 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
             ))}
           </Layer>
           <Layer>
-            <Circle
-              x={mousePos.x}
-              y={mousePos.y}
-              radius={url && enableCursor ? strokeWidth : 0}
-              stroke="#ffffff"
-              strokeWidth={5}
-              fill="#df4b26"
-              opacity={0.5}
-              filters={[Konva.Filters.Pixelate]}
-              pixelSize={10}
-            />
+            { url && enableCursor &&
+              (
+                <Circle
+                  x={mousePos.x}
+                  y={mousePos.y}
+                  radius={strokeWidth}
+                  stroke="#ffffff"
+                  strokeWidth={5}
+                  fill="#df4b26"
+                  opacity={0.5}
+                  filters={[Konva.Filters.Pixelate]}
+                  pixelSize={10}
+                />
+              )
+            }
           </Layer>
         </Stage>
       </div>
