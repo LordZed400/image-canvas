@@ -3,8 +3,9 @@ import Konva from "konva";
 import { Stage, Layer, Image, Line, Circle, Path, Group } from "react-konva";
 import useImage from "use-image";
 
-import ImageScaleHelper from "../../helpers/ImageScaleHelper";
-import { brushTools } from "../../constants/brushTools";
+import ImageScaleHelper from "./../../helpers/ImageScaleHelper";
+import { brushTools } from "./../../constants/brushTools";
+import { ReactComponent as UploadSvg } from "./../../assets/Images/upload.svg";
 
 import "./Canvas.scss";
 import { Button, Divider } from "@mui/material";
@@ -266,58 +267,68 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
   return (
     <div className="canvas-container">
       {!url && (
-        <div className="text-container">
-          Please upload an Image
-          <br />
-          You can draw on top of the image after adding it
+        <div className="upload-container" style={{ width: windowWidth * 0.3, height: windowWidth * 0.3}}>
+          <div className="upload-icon">
+            <UploadSvg className="svg-img"/>
+          </div>
+          <div className="upload-text">
+            Please upload an Image
+            <br />
+            You can draw on top of the image after adding it
+          </div>
         </div>
       )}
-      <div className="stage-container">
-        <Stage
-          width={windowWidth * 0.3}
-          height={windowWidth * 0.3}
-          scaleX={stageInfo.stageScale}
-          scaleY={stageInfo.stageScale}
-          x={stageInfo.stageX}
-          y={stageInfo.stageY}
-          onMouseDown={handleMouseDown}
-          onMousemove={handleMouseMove}
-          onMouseup={handleMouseUp}
-          onMouseEnter={() => { setEnableCursor(true); setStageInfo({...stageInfo, ...{ draggable: false}})}}
-          onMouseLeave={() => { setEnableCursor(false); setStageInfo({...stageInfo, ...{ draggable: true}})}}
-          onWheel={handleWheel}
-        >
-          <Layer>{url && <LoadImage />}</Layer>
-          <Layer>
-            {brush.map((data, i) => (
-              <CreateLines key={i} line={data} />
-            ))}
-            {lasso.map((data, i) => (
-              <CreateLines key={i} line={data} />
-            ))}
-            {path.map((data, i) => (
-              <CreateShape key={i} line={data} />
-            ))}
-          </Layer>
-          <Layer>
-            { url && enableCursor &&
-              (
-                <Circle
-                  x={mousePos.x}
-                  y={mousePos.y}
-                  radius={strokeWidth}
-                  stroke="#df4b26"
-                  strokeWidth={5}
-                  fill="#df4b26"
-                  opacity={0.5}
-                  filters={[Konva.Filters.Pixelate]}
-                  pixelSize={10}
-                />
-              )
-            }
-          </Layer>
-        </Stage>
-      </div>
+      {
+        url && (
+          <div className="stage-container">
+            <Stage
+              width={windowWidth * 0.3}
+              height={windowWidth * 0.3}
+              scaleX={stageInfo.stageScale}
+              scaleY={stageInfo.stageScale}
+              x={stageInfo.stageX}
+              y={stageInfo.stageY}
+              onMouseDown={handleMouseDown}
+              onMousemove={handleMouseMove}
+              onMouseup={handleMouseUp}
+              onMouseEnter={() => { setEnableCursor(true); setStageInfo({...stageInfo, ...{ draggable: false}})}}
+              onMouseLeave={() => { setEnableCursor(false); setStageInfo({...stageInfo, ...{ draggable: true}})}}
+              onWheel={handleWheel}
+            >
+              <Layer>{url && <LoadImage />}</Layer>
+              <Layer>
+                {brush.map((data, i) => (
+                  <CreateLines key={i} line={data} />
+                ))}
+                {lasso.map((data, i) => (
+                  <CreateLines key={i} line={data} />
+                ))}
+                {path.map((data, i) => (
+                  <CreateShape key={i} line={data} />
+                ))}
+              </Layer>
+              <Layer>
+                { url && enableCursor &&
+                  (
+                    <Circle
+                      x={mousePos.x}
+                      y={mousePos.y}
+                      radius={strokeWidth}
+                      stroke="#df4b26"
+                      strokeWidth={5}
+                      fill="#df4b26"
+                      opacity={0.5}
+                      filters={[Konva.Filters.Pixelate]}
+                      pixelSize={10}
+                    />
+                  )
+                }
+              </Layer>
+            </Stage>
+          </div>
+        )
+      }
+      
       <div className="toolbox-container">
         <div className="toolbox-panel">
           <Button className="brush-tool" variant="text" onClick={() => setToolType("brush")}>
