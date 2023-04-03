@@ -125,8 +125,8 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
         setupPathInfo(true);
         break;
       case "eraser":
-        setupLassoInfo(true);
-        setupBrushInfo(true);
+        setupLassoInfo(true, true);
+        setupBrushInfo(true, true);
         break;
       default:
         setupBrushInfo(true);
@@ -157,8 +157,8 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
         setupPathInfo(false);
         break;
       case "eraser":
-        setupLassoInfo(false);
-        setupBrushInfo(false);
+        setupLassoInfo(false, true);
+        setupBrushInfo(false, true);
         break;
       default:
         setupBrushInfo(false);
@@ -170,7 +170,10 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
     isDrawing.current = false;
   };
 
-  const setupLassoInfo = (initial) => {
+  const setupLassoInfo = (initial, eraser) => {
+    if (eraser && lasso.length === 0) {
+      return;
+    }
     if (initial) {
       if (lasso.length === 0) {
         setLasso([
@@ -230,7 +233,10 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
     setPath(path.concat());
   }
 
-  const setupBrushInfo = (initial) => {
+  const setupBrushInfo = (initial, eraser) => {
+    if (eraser && brush.length === 0) {
+      return;
+    }
     if (initial) {
       setBrush([
         ...brush,
