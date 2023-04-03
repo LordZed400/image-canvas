@@ -11,6 +11,7 @@ import './FileHandler.scss';
 
 const FileHandler = () => {
   const [canvasImage, setCanvasImage] = useState();
+  const [clearCanvasTrigger, setClearCanvasTrigger] = useState(0);
   const [file, setFile] = useState();
   const [fileInput, setFileInput] = useState("");
   const [stroke, setStroke] = useState(5);
@@ -36,6 +37,10 @@ const FileHandler = () => {
     setFileInput("");
     setFile();
     setCanvasImage();
+  }
+
+  const clearCanvas = () => {
+    setClearCanvasTrigger((clearCanvasTrigger + 1 ) % 2);
   }
 
   const handleSliderChange = (event, newValue) => {
@@ -136,10 +141,13 @@ const FileHandler = () => {
           <FileInput clickEvent={handleFileUpload} clearEvent={clearFile} fileInput={fileInput} />
         </div>
         <div className="clear-btn">
-          <ButtonComponent clickEvent={clearFile} disabled={fileInput === ""} size="small">Clear</ButtonComponent>
+          <ButtonComponent clickEvent={clearCanvas} disabled={fileInput === ""} size="small">Clear Canvas</ButtonComponent>  
+        </div>
+        <div className="remove-btn">
+          <ButtonComponent clickEvent={clearFile} disabled={fileInput === ""} size="small">Remove File</ButtonComponent>
         </div>
       </div>
-      <CustomCanvas url={canvasImage} strokeWidth={stroke} toolType={tool}/>
+      <CustomCanvas url={canvasImage} clearCanvas={clearCanvasTrigger} strokeWidth={stroke} toolType={tool}/>
     </div>
   );
 }

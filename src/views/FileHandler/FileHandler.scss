@@ -10,16 +10,6 @@
     justify-content: space-around;
     width: 100%;
 
-    .clear-btn {
-      flex-shrink: 1;
-    }
-
-    .upload-btn {
-      align-items: center;
-      display: flex;
-      flex-grow: 1;
-    }
-
     .file-name {
       margin-left: 30px;
       color: $dusty-gray;
