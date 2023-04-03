@@ -18,6 +18,14 @@ class ImageScaleHelper {
       height: img.height * scale
     };
   };
+
+  static getCenterPos = (canvas, img) => {
+    const centerPos = {
+      x: canvas.width / 2 - img.width / 2,
+      y: canvas.height / 2 - img.height / 2,
+    }
+    return centerPos;
+  }
 }
 
 export default ImageScaleHelper;

@@ -2,12 +2,15 @@
 
 .canvas-container {
   align-items: center;
-  background-color: $white;
+  background-color: $zircon;
   border: 2px dashed $iron;
   border-radius: 5px;
   display: flex;
   justify-content: center;
-  margin-top: 15px;
+
+  &.empty-canvas {
+    background-color: $white;
+  }
 
   .upload-container {
     align-items: center;

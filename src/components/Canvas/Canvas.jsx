@@ -85,6 +85,7 @@ const CanvasComponent = ({
   }, [image]);
 
   const windowWidth = window.innerWidth;
+  const windowHeight = window.innerHeight;
 
   const clearCanvas = () => {
     setBrush([]);
@@ -114,12 +115,10 @@ const CanvasComponent = ({
         <Image
           ref={imageRef}
           image={image}
-          // x={windowWidth / 2}
-          // y={windowHeight / 2}
-          // width={scaleInfo.width}
-          // height={scaleInfo.height}
-          x={scaleInfo.x}
-          y={scaleInfo.y}
+          x={windowWidth / 2}
+          y={windowHeight / 2}
+          offsetX={scaleInfo.width / 2}
+          offsetY={scaleInfo.height / 2}
           width={scaleInfo.width}
           height={scaleInfo.height}
         />
@@ -276,7 +275,7 @@ const CanvasComponent = ({
   };
 
   return (
-    <div className="canvas-container">
+    <div className={`canvas-container ${!url ? "empty-canvas": ""}`}>
       {!url && (
         <div
           className="upload-container"
@@ -299,8 +298,8 @@ const CanvasComponent = ({
       {url && (
         <div className="stage-container">
           <Stage
-            width={windowWidth * 0.3}
-            height={windowWidth * 0.3}
+            width={windowWidth}
+            height={windowHeight}
             scaleX={stageInfo.stageScale}
             scaleY={stageInfo.stageScale}
             x={stageInfo.stageX}
