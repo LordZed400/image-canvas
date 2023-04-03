@@ -1,16 +1,17 @@
-import { React, useRef } from 'react';
-import ButtonComponent from '../Button/Button';
+import { React, useRef } from "react";
 
-import './FileInput.scss';
+import { ReactComponent as UploadSvg } from "./../../assets/Images/upload.svg";
 
-const FileInput = ({clickEvent, clearEvent, fileInput}) => {
+import "./FileInput.scss";
+
+const FileInput = ({ clickEvent, clearEvent, fileInput }) => {
   const hiddenFileInput = useRef(null);
-  
+
   const handleClick = () => {
     hiddenFileInput.current.click();
-  }
+  };
 
-  const handleChange = event => {
+  const handleChange = (event) => {
     if (event.target.files.length) {
       clickEvent(event.target);
     } else {
@@ -20,11 +21,16 @@ const FileInput = ({clickEvent, clearEvent, fileInput}) => {
 
   return (
     <div className="file-input-container">
-      <ButtonComponent clickEvent={handleClick} size="small">
-        { fileInput !== "" && "Replace"}
-        { fileInput === "" && "Upload"}
-      </ButtonComponent>
-      <input type="file" className="input-element" ref={hiddenFileInput} value={fileInput} onChange={handleChange}/>
+      <div className="input-icon" onClick={() => handleClick()}>
+        <UploadSvg className="svg-img" />
+      </div>
+      <input
+        type="file"
+        className="input-element"
+        ref={hiddenFileInput}
+        value={fileInput}
+        onChange={handleChange}
+      />
     </div>
   );
 };

@@ -2,21 +2,68 @@
 
 .canvas-container {
   align-items: center;
-  background-color: $gallery;
-  border: 2px dashed $gray-chateau;
+  background-color: $white;
+  border: 2px dashed $iron;
   border-radius: 5px;
   display: flex;
   justify-content: center;
   margin-top: 15px;
 
-  .text-container {
+  .upload-container {
+    align-items: center;
     color: $davys-grey;
+    display: flex;
+    flex-direction: column;
     font-family: "RobotoLight";
-    position: absolute;
+    gap: 50px;
+    justify-content: center;
     text-align: center;
+
+    .upload-icon {
+      height: 50%;
+      width: 50%;
+    }
   }
 
   .stage-container {
     cursor: crosshair;
+  }
+
+  .toolbox-container {
+    left: 325px;
+    position: absolute;
+    top: 25px;
+
+    .toolbox-panel {
+      background-color: $white;
+      border-radius: 15px;
+      box-shadow: 0px 8px 24px rgba(0, 53, 133, 0.1);
+      display: flex;
+      padding: 10px 20px;
+
+      .brush-img {
+        width: 40px;
+        height: 40px;
+      }
+    }
+  }
+  
+  .action-container {
+    position: absolute;
+    right: 25px;
+    top: 25px;
+
+    .action-panel {
+      background-color: $white;
+      border-radius: 15px;
+      box-shadow: 0px 8px 24px rgba(0, 53, 133, 0.1);
+      display: flex;
+      padding: 10px 20px;
+
+      .action-img {
+        width: 40px;
+        height: 40px;
+      }
+    }
   }
 }

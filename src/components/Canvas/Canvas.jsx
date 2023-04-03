@@ -3,10 +3,22 @@ import Konva from "konva";
 import { Stage, Layer, Image, Line, Circle, Path, Group } from "react-konva";
 import useImage from "use-image";
 
-import "./Canvas.scss";
-import ImageScaleHelper from "../../helpers/ImageScaleHelper";
+import ImageScaleHelper from "./../../helpers/ImageScaleHelper";
+import { brushTools } from "./../../constants/brushTools";
 
-const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
+import "./Canvas.scss";
+import { Button, Divider } from "@mui/material";
+import FileInput from "../FileInput/FileInput";
+
+const CanvasComponent = ({
+  url,
+  strokeWidth,
+  toolType,
+  setToolType,
+  clearFile,
+  clickEvent,
+  fileInput,
+}) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [enableCursor, setEnableCursor] = useState(false);
   const [brush, setBrush] = useState([]);
@@ -16,6 +28,36 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
   const [image] = useImage(url);
   const imageRef = useRef();
 
+  const [stageInfo, setStageInfo] = useState({
+    stageScale: 1,
+    stageX: 0,
+    stageY: 0,
+    draggable: false,
+  });
+
+  const handleWheel = (e) => {
+    e.evt.preventDefault();
+
+    const scaleBy = 1.02;
+    const stage = e.target.getStage();
+    const oldScale = stage.scaleX();
+    const mousePointTo = {
+      x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+      y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
+    };
+
+    const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+    setStageInfo({
+      stageScale: newScale,
+      stageX:
+        -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+      stageY:
+        -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
+      draggable: stageInfo.draggable,
+    });
+  };
+
   useEffect(() => {
     if (!url) {
       setBrush([]);
@@ -23,12 +65,6 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       setPath([]);
     }
   }, [url]);
-
-  useEffect(() => {
-    setBrush([]);
-    setLasso([]);
-    setPath([]);
-  }, [clearCanvas]);
 
   // when image is loaded we need to cache the shape
   useEffect(() => {
@@ -38,13 +74,19 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
     }
   }, [image]);
 
-  const windowWidth = window.innerWidth * 0.3;
+  const windowWidth = window.innerWidth;
+
+  const clearCanvas = () => {
+    setBrush([]);
+    setLasso([]);
+    setPath([]);
+  };
 
   const LoadImage = () => {
     if (image) {
       const canvasInfo = {
-        width: windowWidth,
-        height: windowWidth,
+        width: windowWidth * 0.3,
+        height: windowWidth * 0.3,
       };
 
       const imageInfo = {
@@ -62,6 +104,10 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
         <Image
           ref={imageRef}
           image={image}
+          // x={windowWidth / 2}
+          // y={windowHeight / 2}
+          // width={scaleInfo.width}
+          // height={scaleInfo.height}
           x={scaleInfo.x}
           y={scaleInfo.y}
           width={scaleInfo.width}
@@ -90,8 +136,8 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
         setupPathInfo(true);
         break;
       case "eraser":
-        setupLassoInfo(true);
-        setupBrushInfo(true);
+        setupLassoInfo(true, true);
+        setupBrushInfo(true, true);
         break;
       default:
         setupBrushInfo(true);
@@ -113,7 +159,7 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
     if (!isDrawing.current) {
       return;
     }
-    
+
     switch (toolType) {
       case "lasso":
         setupLassoInfo(false);
@@ -122,8 +168,8 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
         setupPathInfo(false);
         break;
       case "eraser":
-        setupLassoInfo(false);
-        setupBrushInfo(false);
+        setupLassoInfo(false, true);
+        setupBrushInfo(false, true);
         break;
       default:
         setupBrushInfo(false);
@@ -135,7 +181,10 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
     isDrawing.current = false;
   };
 
-  const setupLassoInfo = (initial) => {
+  const setupLassoInfo = (initial, eraser) => {
+    if (eraser && lasso.length === 0) {
+      return;
+    }
     if (initial) {
       if (lasso.length === 0) {
         setLasso([
@@ -147,7 +196,7 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
           },
         ]);
         return;
-      } else if(toolType === "eraser") {
+      } else if (toolType === "eraser") {
         if (lasso.length !== 2) {
           setLasso([
             ...lasso,
@@ -163,10 +212,7 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
     }
     const pointIndex = toolType === "eraser" ? 1 : 0;
     let lastLasso = lasso[pointIndex];
-    lastLasso.points = lastLasso.points.concat([
-      mousePos.x,
-      mousePos.y,
-    ]);
+    lastLasso.points = lastLasso.points.concat([mousePos.x, mousePos.y]);
 
     lasso.splice(pointIndex, 1, lastLasso);
     setLasso(lasso.concat());
@@ -178,7 +224,7 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
         ...path,
         {
           tool: toolType,
-          points: [{x: mousePos.x, y: mousePos.y}],
+          points: [{ x: mousePos.x, y: mousePos.y }],
           width: strokeWidth,
         },
       ]);
@@ -193,9 +239,12 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
 
     path.splice(path.length - 1, 1, lastPath);
     setPath(path.concat());
-  }
+  };
 
-  const setupBrushInfo = (initial) => {
+  const setupBrushInfo = (initial, eraser) => {
+    if (eraser && brush.length === 0) {
+      return;
+    }
     if (initial) {
       setBrush([
         ...brush,
@@ -207,63 +256,168 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       ]);
       return;
     }
-    const newPoints = [
-      mousePos.x,
-      mousePos.y,
-    ];
+    const newPoints = [mousePos.x, mousePos.y];
     let lastBrush = brush[brush.length - 1];
     lastBrush.points = lastBrush.points.concat(newPoints);
 
     // replace last
     brush.splice(brush.length - 1, 1, lastBrush);
     setBrush(brush.concat());
-  }
+  };
 
   return (
     <div className="canvas-container">
       {!url && (
-        <div className="text-container">
-          Please upload an Image
-          <br />
-          You can draw on top of the image after adding it
+        <div
+          className="upload-container"
+          style={{ width: windowWidth * 0.3, height: windowWidth * 0.3 }}
+        >
+          <div className="upload-icon">
+            <FileInput
+              clickEvent={clickEvent}
+              clearEvent={clearFile}
+              fileInput={fileInput}
+            />
+          </div>
+          <div className="upload-text">
+            Please upload an Image
+            <br />
+            You can draw on top of the image after adding it
+          </div>
         </div>
       )}
-      <div className="stage-container">
-        <Stage
-          width={windowWidth}
-          height={windowWidth}
-          onMouseDown={handleMouseDown}
-          onMousemove={handleMouseMove}
-          onMouseup={handleMouseUp}
-          onMouseEnter={() => { setEnableCursor(true) }}
-          onMouseLeave={() => { setEnableCursor(false) }}
-        >
-          <Layer>{url && <LoadImage />}</Layer>
-          <Layer>
-            {brush.map((data, i) => (
-              <CreateLines key={i} line={data} />
-            ))}
-            {lasso.map((data, i) => (
-              <CreateLines key={i} line={data} />
-            ))}
-            {path.map((data, i) => (
-              <CreateShape key={i} line={data} />
-            ))}
-          </Layer>
-          <Layer>
-            <Circle
-              x={mousePos.x}
-              y={mousePos.y}
-              radius={url && enableCursor ? strokeWidth : 0}
-              stroke="#ffffff"
-              strokeWidth={5}
-              fill="#df4b26"
-              opacity={0.5}
-              filters={[Konva.Filters.Pixelate]}
-              pixelSize={10}
+      {url && (
+        <div className="stage-container">
+          <Stage
+            width={windowWidth * 0.3}
+            height={windowWidth * 0.3}
+            scaleX={stageInfo.stageScale}
+            scaleY={stageInfo.stageScale}
+            x={stageInfo.stageX}
+            y={stageInfo.stageY}
+            onMouseDown={handleMouseDown}
+            onMousemove={handleMouseMove}
+            onMouseup={handleMouseUp}
+            onMouseEnter={() => {
+              setEnableCursor(true);
+              setStageInfo({ ...stageInfo, ...{ draggable: false } });
+            }}
+            onMouseLeave={() => {
+              setEnableCursor(false);
+              setStageInfo({ ...stageInfo, ...{ draggable: true } });
+            }}
+            onWheel={handleWheel}
+          >
+            <Layer>{url && <LoadImage />}</Layer>
+            <Layer>
+              {brush.map((data, i) => (
+                <CreateLines key={i} line={data} />
+              ))}
+              {lasso.map((data, i) => (
+                <CreateLines key={i} line={data} />
+              ))}
+              {path.map((data, i) => (
+                <CreateShape key={i} line={data} />
+              ))}
+            </Layer>
+            <Layer>
+              {url && enableCursor && (
+                <Circle
+                  x={mousePos.x}
+                  y={mousePos.y}
+                  radius={strokeWidth}
+                  stroke="#df4b26"
+                  strokeWidth={5}
+                  fill="#df4b26"
+                  opacity={0.5}
+                  filters={[Konva.Filters.Pixelate]}
+                  pixelSize={10}
+                />
+              )}
+            </Layer>
+          </Stage>
+        </div>
+      )}
+
+      <div className="toolbox-container">
+        <div className="toolbox-panel">
+          <Button
+            className="brush-tool"
+            variant="text"
+            onClick={() => setToolType("brush")}
+          >
+            <img
+              className="brush-img"
+              src={brushTools.brush}
+              alt="brush-tool"
             />
-          </Layer>
-        </Stage>
+          </Button>
+          <Button
+            className="lasso-tool"
+            variant="text"
+            onClick={() => setToolType("lasso")}
+          >
+            <img
+              className="brush-img"
+              src={brushTools.lasso}
+              alt="lasso-tool"
+            />
+          </Button>
+          <Button
+            className="path-tool"
+            variant="text"
+            onClick={() => setToolType("path")}
+          >
+            <img
+              className="brush-img"
+              src={brushTools.polyline}
+              alt="path-tool"
+            />
+          </Button>
+          <Button
+            className="eraser-tool"
+            variant="text"
+            onClick={() => setToolType("eraser")}
+          >
+            <img
+              className="brush-img"
+              src={brushTools.eraser}
+              alt="eraser-tool"
+            />
+          </Button>
+        </div>
+      </div>
+      <div className="action-container">
+        <div className="action-panel">
+          <Button
+            className="clear-tool"
+            variant="text"
+            disabled={url === ""}
+            onClick={() => clearCanvas()}
+          >
+            <img
+              className="action-img"
+              src={brushTools.clear}
+              alt="clear-tool"
+            />
+          </Button>
+          <Button
+            className="remove-tool"
+            variant="text"
+            disabled={url === ""}
+            onClick={() => clearFile()}
+          >
+            <img
+              className="action-img"
+              src={brushTools.remove}
+              alt="remove-tool"
+            />
+          </Button>
+          <Divider orientation="vertical" flexItem />
+          <Button className="pan-tool" variant="text">
+            <img className="action-img" src={brushTools.pan} alt="pan-tool" />
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -290,7 +444,7 @@ const CreateShape = (value) => {
       />
     </Group>
   );
-}
+};
 
 const CreateLines = (value) => {
   return (
@@ -308,5 +462,5 @@ const CreateLines = (value) => {
       />
     </Group>
   );
-}
+};
 export default CanvasComponent;
