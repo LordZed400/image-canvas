@@ -110,12 +110,22 @@ const FileHandler = () => {
           </List>
           <List className='drawer-list drawer-list-tool'>
             <ListItem className='drawer-list-item'>
-              <span className="drawer-list-label">Tool type: </span> { tool === "pen" ? "Brush" : "Eraser" }
+              <span className="drawer-list-label">Tool type: </span> { tool.charAt(0).toUpperCase() + tool.substring(1) }
             </ListItem>
             <ListItem className='drawer-list-item'>
               <div className='drawer-list-stack'>
                 <div className="drawer-list-stack-item">
-                  <ButtonComponent clickEvent={() => { setTool("pen") }}>Brush</ButtonComponent>
+                  <ButtonComponent clickEvent={() => { setTool("brush") }}>Brush</ButtonComponent>
+                </div>
+                <div className="drawer-list-stack-item">
+                  <ButtonComponent clickEvent={() => { setTool("lasso") }}>Lasso</ButtonComponent>
+                </div>
+              </div>
+            </ListItem>
+            <ListItem className='drawer-list-item'>
+              <div className='drawer-list-stack'>
+                <div className="drawer-list-stack-item">
+                  <ButtonComponent clickEvent={() => { setTool("path") }}>Path</ButtonComponent>
                 </div>
                 <div className="drawer-list-stack-item">
                   <ButtonComponent clickEvent={() => { setTool("eraser") }}>Eraser</ButtonComponent>

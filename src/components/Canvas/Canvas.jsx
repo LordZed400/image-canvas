@@ -9,19 +9,25 @@ import ImageScaleHelper from "../../helpers/ImageScaleHelper";
 const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [enableCursor, setEnableCursor] = useState(false);
-  const [lines, setLines] = useState([]);
+  const [brush, setBrush] = useState([]);
+  const [lasso, setLasso] = useState([]);
+  const [path, setPath] = useState([]);
   const isDrawing = useRef(false);
   const [image] = useImage(url);
   const imageRef = useRef();
 
   useEffect(() => {
     if (!url) {
-      setLines([]);
+      setBrush([]);
+      setLasso([]);
+      setPath([]);
     }
   }, [url]);
 
   useEffect(() => {
-    setLines([]);
+    setBrush([]);
+    setLasso([]);
+    setPath([]);
   }, [clearCanvas]);
 
   // when image is loaded we need to cache the shape
@@ -60,8 +66,6 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
           y={scaleInfo.y}
           width={scaleInfo.width}
           height={scaleInfo.height}
-          // filters={[Konva.Filters.Pixelate]}
-          // pixelSize={10}
         />
       );
     }
@@ -78,14 +82,16 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       y: mousePosition.y,
     });
 
-    if (lines.length === 0) {
-      setLines([
-        {
-          tool: toolType,
-          points: [mousePosition.x, mousePosition.y],
-          width: strokeWidth,
-        },
-      ]);
+    switch (toolType) {
+      case "lasso":
+        setupLassoInfo(true);
+        break;
+      case "path":
+        setupPathInfo(true);
+        break;
+      default:
+        setupBrushInfo(true);
+        break;
     }
   };
 
@@ -104,31 +110,91 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       return;
     }
     
-    let lastLine = lines[lines.length - 1];
-    // add point
-    lastLine.points = lastLine.points.concat([
-      mousePosition.x,
-      mousePosition.y,
-    ]);
-
-    // replace last
-    // lines.splice(lines.length - 1, 1, lastLine);
-    // setLines(lines.concat());
-    setLines([lastLine]);
-
-    // setLines([
-    //   ...lines,
-    //   {
-    //     tool: toolType,
-    //     points: [mousePosition.x, mousePosition.y],
-    //     width: strokeWidth,
-    //   },
-    // ]);
+    switch (toolType) {
+      case "lasso":
+        setupLassoInfo(false);
+        break;
+      case "path":
+        setupPathInfo(false);
+        break;
+      default:
+        setupBrushInfo(false);
+        break;
+    }
   };
 
   const handleMouseUp = () => {
     isDrawing.current = false;
   };
+
+  const setupLassoInfo = (initial) => {
+    if (initial) {
+      if (lasso.length === 0) {
+        setLasso([
+          ...lasso,
+          {
+            tool: toolType,
+            points: [mousePos.x, mousePos.y],
+            width: strokeWidth,
+          },
+        ]);
+      }
+      return;
+    }
+    let lastLasso = lasso[lasso.length - 1];
+    lastLasso.points = lastLasso.points.concat([
+      mousePos.x,
+      mousePos.y,
+    ]);
+
+    lasso.splice(lasso.length - 1, 1, lastLasso);
+    setLasso(lasso.concat());
+  };
+
+  const setupPathInfo = (initial) => {
+    if (initial) {
+      setPath([
+        ...path,
+        {
+          tool: toolType,
+          points: [{x: mousePos.x, y: mousePos.y}],
+          width: strokeWidth,
+        },
+      ]);
+      return;
+    }
+    let lastPath = path[path.length - 1];
+    lastPath.points = lastPath.points.concat({
+      x: mousePos.x,
+      y: mousePos.y,
+    });
+
+    path.splice(path.length - 1, 1, lastPath);
+    setPath(path.concat());
+  }
+
+  const setupBrushInfo = (initial) => {
+    if (initial) {
+      setBrush([
+        ...brush,
+        {
+          tool: toolType,
+          points: [mousePos.x, mousePos.y],
+          width: strokeWidth,
+        },
+      ]);
+      return;
+    }
+    let lastBrush = brush[brush.length - 1];
+    lastBrush.points = lastBrush.points.concat([
+      mousePos.x,
+      mousePos.y,
+    ]);
+
+    // replace last
+    brush.splice(brush.length - 1, 1, lastBrush);
+    setBrush(brush.concat());
+  }
 
   return (
     <div className="canvas-container">
@@ -151,19 +217,14 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
         >
           <Layer>{url && <LoadImage />}</Layer>
           <Layer>
-            {lines.map((line, i) => (
-              <Line
-                key={i}
-                points={line.points}
-                stroke="#df4b26"
-                strokeWidth={line.width * 2}
-                opacity={line.tool === "eraser" ? 1 : 0.5}
-                lineCap="round"
-                lineJoin="round"
-                globalCompositeOperation={
-                  line.tool === "eraser" ? "destination-out" : "source-over"
-                }
-              />
+            {brush.map((data, i) => (
+              <CreateLines key={i} line={data} />
+            ))}
+            {lasso.map((data, i) => (
+              <CreateLines key={i} line={data} />
+            ))}
+            {path.map((data, i) => (
+              <CreateShape key={i} line={data} />
             ))}
           </Layer>
           <Layer>
@@ -184,5 +245,43 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
     </div>
   );
 };
+
+const CreateShape = (value) => {
+  // debugger;
+  const svgPath = value.line.points.reduce(
+    (path, point, index) =>
+      `${path}${index === 0 ? "M" : "L"}${point.x},${point.y}`,
+    ""
+  );
+
+  return (
+    <Path
+      x={value.line.points.x}
+      y={value.line.points.y}
+      data={svgPath}
+      fill="#df4b26"
+      opacity={value.line.tool === "eraser" ? 1 : 0.5}
+      globalCompositeOperation={
+        value.line.tool === "eraser" ? "destination-out" : "source-over"
+      }
+    />
+  );
+}
+
+const CreateLines = (value) => {
+  return (
+    <Line
+      points={value.line.points}
+      stroke="#df4b26"
+      strokeWidth={value.line.width * 2}
+      opacity={value.line.tool === "eraser" ? 1 : 0.5}
+      lineCap="round"
+      lineJoin="round"
+      globalCompositeOperation={
+        value.line.tool === "eraser" ? "destination-out" : "source-over"
+      }
+    />
+  );
+}
 
 export default CanvasComponent;
