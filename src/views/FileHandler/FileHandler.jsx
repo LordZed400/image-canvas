@@ -1,7 +1,8 @@
-import { React, useState } from 'react';
+import { React, useState, useEffect } from 'react';
 import { useTheme } from '@mui/material/styles';
 import { Slider, Drawer, IconButton, Divider, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { ChevronLeft, ChevronRight, Inbox, Mail } from '@mui/icons-material'
+import { useLocation } from 'react-router-dom';
 
 import CustomCanvas from '../../components/Canvas/Canvas';
 import ButtonComponent from '../../components/Button/Button';
@@ -18,12 +19,20 @@ const FileHandler = () => {
   const [tool, setTool] = useState("brush");
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const location = useLocation();
+  
+  useEffect(() => {
+    if (location.state) {
+      setCanvasImage(location.state.image);
+    }
+  }, [location.state]);
 
   const handleDrawerToggle = () => {
     setOpen(!open);
   }
 
   const handleDrawerClose = () => {
+    debugger;
     setOpen(false);
   };
   
@@ -66,14 +75,14 @@ const FileHandler = () => {
             Information
           </div>
           <div className="drawer-icon">
-            <IconButton onClick={handleDrawerClose}>
+            <IconButton onClick={() => handleDrawerClose()}>
               {theme.direction === 'ltr' ? <ChevronLeft /> : <ChevronRight />}
             </IconButton>
           </div>
         </div>
         <Divider />
         {
-          canvasImage && (
+          canvasImage && file && (
             <div className="drawer-item-details-container">
               <List className='drawer-list'>
                 <ListItem className='drawer-list-item'>
@@ -82,7 +91,7 @@ const FileHandler = () => {
                 <ListItem className='drawer-list-item'>
                   <div className='drawer-list-stack vertical-stack'>
                     <div className="drawer-list-stack-item">
-                      Name: {file.name}
+                      Name: { file.name }
                     </div>
                   </div>
                 </ListItem>
@@ -151,10 +160,10 @@ const FileHandler = () => {
           <FileInput clickEvent={handleFileUpload} clearEvent={clearFile} fileInput={fileInput} />
         </div>
         <div className="clear-btn">
-          <ButtonComponent clickEvent={clearCanvas} disabled={fileInput === ""} size="small">Clear Canvas</ButtonComponent>  
+          <ButtonComponent clickEvent={clearCanvas} disabled={canvasImage === ""} size="small">Clear Canvas</ButtonComponent>  
         </div>
         <div className="remove-btn">
-          <ButtonComponent clickEvent={clearFile} disabled={fileInput === ""} size="small">Remove File</ButtonComponent>
+          <ButtonComponent clickEvent={clearFile} disabled={canvasImage === ""} size="small">Remove File</ButtonComponent>
         </div>
       </div>
       <CustomCanvas url={canvasImage} clearCanvas={clearCanvasTrigger} strokeWidth={stroke} toolType={tool}/>
