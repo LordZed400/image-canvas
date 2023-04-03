@@ -32,7 +32,6 @@ const FileHandler = () => {
   }
 
   const handleDrawerClose = () => {
-    debugger;
     setOpen(false);
   };
   

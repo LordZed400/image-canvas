@@ -36,11 +36,14 @@
   }
 
   .content-container {
+    display: flex;
+    flex-grow: 1;
     min-height: 100vh;
     height: 100%;
     overflow-x: hidden;
     
     .content {
+      flex-grow: 1;
       padding: 120px;
     }
 
@@ -73,27 +76,34 @@
     .image-container {
       padding: 50px 10em 0;
       height: auto;
+      
+      .image-grid-container {
+        background-color: $white;
+        border-radius: 10px;;
+        padding: 24px 48px 0 24px;
+      }
     }
 
-    .image-grid-container {
-      background-color: $white;
-      border-radius: 10px;;
-      padding: 24px 48px 0 24px;
-    }
-
-    .image-set {
-      background-size: cover;
-      height: 500px;
-      margin-bottom: 50px;
-      width: 100%;
-      transition: 0.3s ease-in-out;
+    .image-set-container {
+      background-color: $mercury;
       border-radius: 10px;
+      margin-bottom: 50px;
+      transition: 0.3s ease-in-out;
       z-index: 1;
 
       &:hover {
         cursor: pointer;
         transform: scale(1.1);
+        outline: 1.5px solid $black;
+      }
+
+      .image-set {
+        background-size: cover;
+        height: 300px;
+        width: 100%;
+        border-radius: 10px;
       }
     }
+
   }
 }

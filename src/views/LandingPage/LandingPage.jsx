@@ -1,5 +1,5 @@
 import React from 'react';
-import { Typography, Grid } from '@mui/material';
+import { Typography, Grid, Box } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import { imageSet } from '../../assets/Images/imageSet';
 
@@ -47,8 +47,10 @@ const LandingPage = () => {
           <div className="image-container">
             <Grid className='image-grid-container' container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
               { imageSet.map( (item, index) => (
-                <Grid item xs={3} sm={3} md={3} key={index}>
-                  <img className="image-set" src={item} onClick={() => navigateWithImage(item, index)} alt={`Set ${index}`} />
+                <Grid item xs={3} sm={3} md={3} key={index} >
+                  <div className="image-set-container" onClick={() => navigateWithImage(item, index)}>
+                    <Box className="image-set" sx={{ backgroundImage: `url(${item})` }}></Box>
+                  </div>
                 </Grid>
               ))}
             </Grid>
