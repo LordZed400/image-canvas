@@ -121,6 +121,10 @@ const CanvasComponent = ({
   };
 
   const handleMouseDown = (e) => {
+    if (stageInfo.draggable) {
+      document.body.style.cursor = "grabbing";
+    }
+
     if (!url || stageInfo.draggable) {
       return;
     }
@@ -181,6 +185,9 @@ const CanvasComponent = ({
   };
 
   const handleMouseUp = () => {
+    if (stageInfo.draggable) {
+      document.body.style.cursor = "grab";
+    }
     isDrawing.current = false;
   };
 
@@ -243,7 +250,7 @@ const CanvasComponent = ({
             onMouseup={handleMouseUp}
             onMouseEnter={() => {
               if (stageInfo.draggable) {
-                document.body.style.cursor = "grabbing";
+                document.body.style.cursor = "grab";
               } else {
                 document.body.style.cursor = "default";
               }
