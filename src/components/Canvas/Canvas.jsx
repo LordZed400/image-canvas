@@ -5,12 +5,20 @@ import useImage from "use-image";
 
 import ImageScaleHelper from "./../../helpers/ImageScaleHelper";
 import { brushTools } from "./../../constants/brushTools";
-import { ReactComponent as UploadSvg } from "./../../assets/Images/upload.svg";
 
 import "./Canvas.scss";
 import { Button, Divider } from "@mui/material";
+import FileInput from "../FileInput/FileInput";
 
-const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }) => {
+const CanvasComponent = ({
+  url,
+  strokeWidth,
+  toolType,
+  setToolType,
+  clearFile,
+  clickEvent,
+  fileInput,
+}) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [enableCursor, setEnableCursor] = useState(false);
   const [brush, setBrush] = useState([]);
@@ -24,9 +32,9 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
     stageScale: 1,
     stageX: 0,
     stageY: 0,
-    draggable: false
+    draggable: false,
   });
-  
+
   const handleWheel = (e) => {
     e.evt.preventDefault();
 
@@ -35,7 +43,7 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
     const oldScale = stage.scaleX();
     const mousePointTo = {
       x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-      y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale
+      y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
     };
 
     const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
@@ -46,7 +54,7 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
         -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
       stageY:
         -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
-      draggable: stageInfo.draggable
+      draggable: stageInfo.draggable,
     });
   };
 
@@ -73,7 +81,7 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
     setBrush([]);
     setLasso([]);
     setPath([]);
-  }
+  };
 
   const LoadImage = () => {
     if (image) {
@@ -152,7 +160,7 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
     if (!isDrawing.current) {
       return;
     }
-    
+
     switch (toolType) {
       case "lasso":
         setupLassoInfo(false);
@@ -189,7 +197,7 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
           },
         ]);
         return;
-      } else if(toolType === "eraser") {
+      } else if (toolType === "eraser") {
         if (lasso.length !== 2) {
           setLasso([
             ...lasso,
@@ -205,10 +213,7 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
     }
     const pointIndex = toolType === "eraser" ? 1 : 0;
     let lastLasso = lasso[pointIndex];
-    lastLasso.points = lastLasso.points.concat([
-      mousePos.x,
-      mousePos.y,
-    ]);
+    lastLasso.points = lastLasso.points.concat([mousePos.x, mousePos.y]);
 
     lasso.splice(pointIndex, 1, lastLasso);
     setLasso(lasso.concat());
@@ -220,7 +225,7 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
         ...path,
         {
           tool: toolType,
-          points: [{x: mousePos.x, y: mousePos.y}],
+          points: [{ x: mousePos.x, y: mousePos.y }],
           width: strokeWidth,
         },
       ]);
@@ -235,7 +240,7 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
 
     path.splice(path.length - 1, 1, lastPath);
     setPath(path.concat());
-  }
+  };
 
   const setupBrushInfo = (initial, eraser) => {
     if (eraser && brush.length === 0) {
@@ -252,24 +257,28 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
       ]);
       return;
     }
-    const newPoints = [
-      mousePos.x,
-      mousePos.y,
-    ];
+    const newPoints = [mousePos.x, mousePos.y];
     let lastBrush = brush[brush.length - 1];
     lastBrush.points = lastBrush.points.concat(newPoints);
 
     // replace last
     brush.splice(brush.length - 1, 1, lastBrush);
     setBrush(brush.concat());
-  }
+  };
 
   return (
     <div className="canvas-container">
       {!url && (
-        <div className="upload-container" style={{ width: windowWidth * 0.3, height: windowWidth * 0.3}}>
+        <div
+          className="upload-container"
+          style={{ width: windowWidth * 0.3, height: windowWidth * 0.3 }}
+        >
           <div className="upload-icon">
-            <UploadSvg className="svg-img"/>
+            <FileInput
+              clickEvent={clickEvent}
+              clearEvent={clearFile}
+              fileInput={fileInput}
+            />
           </div>
           <div className="upload-text">
             Please upload an Image
@@ -278,80 +287,132 @@ const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }
           </div>
         </div>
       )}
-      {
-        url && (
-          <div className="stage-container">
-            <Stage
-              width={windowWidth * 0.3}
-              height={windowWidth * 0.3}
-              scaleX={stageInfo.stageScale}
-              scaleY={stageInfo.stageScale}
-              x={stageInfo.stageX}
-              y={stageInfo.stageY}
-              onMouseDown={handleMouseDown}
-              onMousemove={handleMouseMove}
-              onMouseup={handleMouseUp}
-              onMouseEnter={() => { setEnableCursor(true); setStageInfo({...stageInfo, ...{ draggable: false}})}}
-              onMouseLeave={() => { setEnableCursor(false); setStageInfo({...stageInfo, ...{ draggable: true}})}}
-              onWheel={handleWheel}
-            >
-              <Layer>{url && <LoadImage />}</Layer>
-              <Layer>
-                {brush.map((data, i) => (
-                  <CreateLines key={i} line={data} />
-                ))}
-                {lasso.map((data, i) => (
-                  <CreateLines key={i} line={data} />
-                ))}
-                {path.map((data, i) => (
-                  <CreateShape key={i} line={data} />
-                ))}
-              </Layer>
-              <Layer>
-                { url && enableCursor &&
-                  (
-                    <Circle
-                      x={mousePos.x}
-                      y={mousePos.y}
-                      radius={strokeWidth}
-                      stroke="#df4b26"
-                      strokeWidth={5}
-                      fill="#df4b26"
-                      opacity={0.5}
-                      filters={[Konva.Filters.Pixelate]}
-                      pixelSize={10}
-                    />
-                  )
-                }
-              </Layer>
-            </Stage>
-          </div>
-        )
-      }
-      
+      {url && (
+        <div className="stage-container">
+          <Stage
+            width={windowWidth * 0.3}
+            height={windowWidth * 0.3}
+            scaleX={stageInfo.stageScale}
+            scaleY={stageInfo.stageScale}
+            x={stageInfo.stageX}
+            y={stageInfo.stageY}
+            onMouseDown={handleMouseDown}
+            onMousemove={handleMouseMove}
+            onMouseup={handleMouseUp}
+            onMouseEnter={() => {
+              setEnableCursor(true);
+              setStageInfo({ ...stageInfo, ...{ draggable: false } });
+            }}
+            onMouseLeave={() => {
+              setEnableCursor(false);
+              setStageInfo({ ...stageInfo, ...{ draggable: true } });
+            }}
+            onWheel={handleWheel}
+          >
+            <Layer>{url && <LoadImage />}</Layer>
+            <Layer>
+              {brush.map((data, i) => (
+                <CreateLines key={i} line={data} />
+              ))}
+              {lasso.map((data, i) => (
+                <CreateLines key={i} line={data} />
+              ))}
+              {path.map((data, i) => (
+                <CreateShape key={i} line={data} />
+              ))}
+            </Layer>
+            <Layer>
+              {url && enableCursor && (
+                <Circle
+                  x={mousePos.x}
+                  y={mousePos.y}
+                  radius={strokeWidth}
+                  stroke="#df4b26"
+                  strokeWidth={5}
+                  fill="#df4b26"
+                  opacity={0.5}
+                  filters={[Konva.Filters.Pixelate]}
+                  pixelSize={10}
+                />
+              )}
+            </Layer>
+          </Stage>
+        </div>
+      )}
+
       <div className="toolbox-container">
         <div className="toolbox-panel">
-          <Button className="brush-tool" variant="text" onClick={() => setToolType("brush")}>
-            <img className="brush-img" src={brushTools.brush} alt="brush-tool" />
+          <Button
+            className="brush-tool"
+            variant="text"
+            onClick={() => setToolType("brush")}
+          >
+            <img
+              className="brush-img"
+              src={brushTools.brush}
+              alt="brush-tool"
+            />
           </Button>
-          <Button className="lasso-tool" variant="text" onClick={() => setToolType("lasso")}>
-            <img className="brush-img" src={brushTools.lasso} alt="lasso-tool" />
+          <Button
+            className="lasso-tool"
+            variant="text"
+            onClick={() => setToolType("lasso")}
+          >
+            <img
+              className="brush-img"
+              src={brushTools.lasso}
+              alt="lasso-tool"
+            />
           </Button>
-          <Button className="path-tool" variant="text" onClick={() => setToolType("path")}>
-            <img className="brush-img" src={brushTools.polyline} alt="path-tool" />
+          <Button
+            className="path-tool"
+            variant="text"
+            onClick={() => setToolType("path")}
+          >
+            <img
+              className="brush-img"
+              src={brushTools.polyline}
+              alt="path-tool"
+            />
           </Button>
-          <Button className="eraser-tool" variant="text" onClick={() => setToolType("eraser")}>
-            <img className="brush-img" src={brushTools.eraser} alt="eraser-tool" />
+          <Button
+            className="eraser-tool"
+            variant="text"
+            onClick={() => setToolType("eraser")}
+          >
+            <img
+              className="brush-img"
+              src={brushTools.eraser}
+              alt="eraser-tool"
+            />
           </Button>
         </div>
       </div>
       <div className="action-container">
         <div className="action-panel">
-          <Button className="clear-tool" variant="text" disabled={url === ""} onClick={() => clearCanvas()}>
-            <img className="action-img" src={brushTools.clear} alt="clear-tool" />
+          <Button
+            className="clear-tool"
+            variant="text"
+            disabled={url === ""}
+            onClick={() => clearCanvas()}
+          >
+            <img
+              className="action-img"
+              src={brushTools.clear}
+              alt="clear-tool"
+            />
           </Button>
-          <Button className="remove-tool" variant="text" disabled={url === ""} onClick={() => clearFile()}>
-            <img className="action-img" src={brushTools.remove} alt="remove-tool" />
+          <Button
+            className="remove-tool"
+            variant="text"
+            disabled={url === ""}
+            onClick={() => clearFile()}
+          >
+            <img
+              className="action-img"
+              src={brushTools.remove}
+              alt="remove-tool"
+            />
           </Button>
           <Divider orientation="vertical" flexItem />
           <Button className="pan-tool" variant="text">
@@ -384,7 +445,7 @@ const CreateShape = (value) => {
       />
     </Group>
   );
-}
+};
 
 const CreateLines = (value) => {
   return (
@@ -402,5 +463,5 @@ const CreateLines = (value) => {
       />
     </Group>
   );
-}
+};
 export default CanvasComponent;
