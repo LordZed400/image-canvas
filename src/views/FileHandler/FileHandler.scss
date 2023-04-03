@@ -2,8 +2,12 @@
 
 .file-handler-container {
   align-items: center;
+  background-color: $zircon;
   display: flex;
   flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  width: 100vw;
 
   .button-container {
     display: flex;
@@ -11,8 +15,8 @@
     width: 100%;
 
     .file-name {
-      margin-left: 30px;
       color: $dusty-gray;
+      margin-left: 30px;
 
       &.valid {
         color: $black;
@@ -21,12 +25,13 @@
   }
 
   .drawer-container {
-    width: 300px;
     flex-shrink: 0;
-
+    width: 300px;
+    
     & .MuiDrawer-paper {
+      box-shadow: 0px 8px 24px rgba(0, 53, 133, 0.3);
+      box-sizing: "border-box";
       width: 300px;
-      box-sizing: "border-box"
     }
 
     .drawer-header {
