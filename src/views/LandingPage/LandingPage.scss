@@ -1,18 +1,21 @@
 @import "./../../index.scss";
 
 .landing-page-container {
-  background: $wild-sand;
+  background: $zircon;
+  display: flex;
 
   .title-container {
     align-items: center;
     background: $white;
+    box-shadow: 0px 0px 24px rgba(10, 100, 252, 0.05);
     display: flex;
-    height: 100px;
+    height: 80px;
     justify-content: center;
-    position: absolute;
+    position: fixed;
     text-align: center;
     width: 100%;
-    
+    z-index: 2;
+
     .outer-title {
       border-bottom: 2px solid $black;
       padding: 5px 15px;
@@ -33,14 +36,64 @@
   }
 
   .content-container {
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    overflow: hidden;
-    width: 100vw;
+    min-height: 100vh;
+    height: 100%;
+    overflow-x: hidden;
     
     .content {
-      padding-top: 120px;
+      padding: 120px;
+    }
+
+    .text-container {
+      font-size: 15px;
+      padding: 0px 10em 0;
+
+      .grid-item {
+        align-items: flex-end;
+        display: flex;
+        font-family: "RobotoMedium";
+      }
+
+      .main-title {
+        align-items: center;
+        justify-content: start;
+      }
+
+      .divider-text {
+        font-family: "Lobster";
+        font-size: 30px;
+        justify-content: center;
+      }
+
+      .navigate-link {
+        justify-content: flex-end;
+      }
+    }
+    
+    .image-container {
+      padding: 50px 10em 0;
+      height: auto;
+    }
+
+    .image-grid-container {
+      background-color: $white;
+      border-radius: 10px;;
+      padding: 24px 48px 0 24px;
+    }
+
+    .image-set {
+      background-size: cover;
+      height: 500px;
+      margin-bottom: 50px;
+      width: 100%;
+      transition: 0.3s ease-in-out;
+      border-radius: 10px;
+      z-index: 1;
+
+      &:hover {
+        cursor: pointer;
+        transform: scale(1.1);
+      }
     }
   }
 }
