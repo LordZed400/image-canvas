@@ -32,8 +32,8 @@ class ImageScaleHelper {
     const stage = target.getStage();
     const oldScale = stage.scaleX();
     const mousePointTo = {
-      x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-      y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
+      x: (stage.getPointerPosition().x - stage.x()) / oldScale,
+      y: (stage.getPointerPosition().y - stage.y()) / oldScale,
     };
 
     const newScale = deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;

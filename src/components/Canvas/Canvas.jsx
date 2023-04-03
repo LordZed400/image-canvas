@@ -58,7 +58,7 @@ const CanvasComponent = ({
 
   const handleWheel = (e) => {
     e.evt.preventDefault();
-
+    // TODO: fix the broken mousePosition after scaling
     setStageInfo({ ...ImageScaleHelper.calculateStageZoom(e.target, e.evt.deltaY), ...{draggable: stageInfo.draggable}});
   };
 
@@ -201,7 +201,7 @@ const CanvasComponent = ({
   };
 
   const setupLassoInfo = (initial) => {
-    const lassoInfo = CanvasHelper.setupLassoInfo(initial, strokeWidth, path, mousePos);
+    const lassoInfo = CanvasHelper.setupLassoInfo(initial, strokeWidth, lasso, mousePos);
     if (!lassoInfo) {
       return;
     }
