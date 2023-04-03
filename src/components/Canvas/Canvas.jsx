@@ -9,7 +9,7 @@ import { brushTools } from "../../constants/brushTools";
 import "./Canvas.scss";
 import { Button, Divider } from "@mui/material";
 
-const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
+const CanvasComponent = ({ url , strokeWidth, toolType, setToolType, clearFile }) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const [enableCursor, setEnableCursor] = useState(false);
   const [brush, setBrush] = useState([]);
@@ -57,12 +57,6 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
     }
   }, [url]);
 
-  useEffect(() => {
-    setBrush([]);
-    setLasso([]);
-    setPath([]);
-  }, [clearCanvas]);
-
   // when image is loaded we need to cache the shape
   useEffect(() => {
     if (image) {
@@ -73,6 +67,12 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
 
   const windowWidth = window.innerWidth;
   const windowHeight = window.innerHeight - 200;
+
+  const clearCanvas = () => {
+    setBrush([]);
+    setLasso([]);
+    setPath([]);
+  }
 
   const LoadImage = () => {
     if (image) {
@@ -320,26 +320,26 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
       </div>
       <div className="toolbox-container">
         <div className="toolbox-panel">
-          <Button className="brush-tool" variant="text">
+          <Button className="brush-tool" variant="text" onClick={() => setToolType("brush")}>
             <img className="brush-img" src={brushTools.brush} alt="brush-tool" />
           </Button>
-          <Button className="lasso-tool" variant="text">
+          <Button className="lasso-tool" variant="text" onClick={() => setToolType("lasso")}>
             <img className="brush-img" src={brushTools.lasso} alt="lasso-tool" />
           </Button>
-          <Button className="path-tool" variant="text">
+          <Button className="path-tool" variant="text" onClick={() => setToolType("path")}>
             <img className="brush-img" src={brushTools.polyline} alt="path-tool" />
           </Button>
-          <Button className="eraser-tool" variant="text">
+          <Button className="eraser-tool" variant="text" onClick={() => setToolType("eraser")}>
             <img className="brush-img" src={brushTools.eraser} alt="eraser-tool" />
           </Button>
         </div>
       </div>
       <div className="action-container">
         <div className="action-panel">
-          <Button className="clear-tool" variant="text">
+          <Button className="clear-tool" variant="text" disabled={url === ""} onClick={() => clearCanvas()}>
             <img className="action-img" src={brushTools.clear} alt="clear-tool" />
           </Button>
-          <Button className="remove-tool" variant="text">
+          <Button className="remove-tool" variant="text" disabled={url === ""} onClick={() => clearFile()}>
             <img className="action-img" src={brushTools.remove} alt="remove-tool" />
           </Button>
           <Divider orientation="vertical" flexItem />
