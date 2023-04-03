@@ -41,6 +41,12 @@
       display: flex;
       padding: 10px 20px;
 
+      .toolbox-tool {
+        &.active {
+          background-color: $tropical-blue;
+        }
+      }
+
       .brush-img {
         width: 40px;
         height: 40px;

@@ -2,13 +2,23 @@ import { React, useState, useEffect, useRef } from "react";
 import Konva from "konva";
 import { Stage, Layer, Image, Line, Circle, Path, Group } from "react-konva";
 import useImage from "use-image";
+import { Button, Divider, Tooltip, tooltipClasses } from "@mui/material";
+import { styled } from '@mui/material/styles';
 
 import ImageScaleHelper from "./../../helpers/ImageScaleHelper";
 import { brushTools } from "./../../constants/brushTools";
+import FileInput from "../FileInput/FileInput";
 
 import "./Canvas.scss";
-import { Button, Divider } from "@mui/material";
-import FileInput from "../FileInput/FileInput";
+
+const CustomWidthTooltip = styled(({ className, ...props }) => (
+  <Tooltip {...props} classes={{ popper: className }} />
+))({
+  [`& .${tooltipClasses.tooltip}`]: {
+    minWidth: 50,
+    textAlign: "center"
+  },
+});
 
 const CanvasComponent = ({
   url,
@@ -341,82 +351,96 @@ const CanvasComponent = ({
 
       <div className="toolbox-container">
         <div className="toolbox-panel">
-          <Button
-            className="brush-tool"
-            variant="text"
-            onClick={() => setToolType("brush")}
-          >
-            <img
-              className="brush-img"
-              src={brushTools.brush}
-              alt="brush-tool"
-            />
-          </Button>
-          <Button
-            className="lasso-tool"
-            variant="text"
-            onClick={() => setToolType("lasso")}
-          >
-            <img
-              className="brush-img"
-              src={brushTools.lasso}
-              alt="lasso-tool"
-            />
-          </Button>
-          <Button
-            className="path-tool"
-            variant="text"
-            onClick={() => setToolType("path")}
-          >
-            <img
-              className="brush-img"
-              src={brushTools.polyline}
-              alt="path-tool"
-            />
-          </Button>
-          <Button
-            className="eraser-tool"
-            variant="text"
-            onClick={() => setToolType("eraser")}
-          >
-            <img
-              className="brush-img"
-              src={brushTools.eraser}
-              alt="eraser-tool"
-            />
-          </Button>
+          <CustomWidthTooltip title="Brush" arrow>
+            <Button
+              className={`toolbox-tool brush-tool ${toolType === "brush" ? 'active' : ''}`}
+              variant="text"
+              onClick={() => setToolType("brush")}
+            >
+              <img
+                className="brush-img"
+                src={brushTools.brush}
+                alt="brush-tool"
+              />
+            </Button>
+          </CustomWidthTooltip>
+          <CustomWidthTooltip title="Lasso" arrow>
+            <Button
+              className={`toolbox-tool lasso-tool ${toolType === "lasso" ? 'active' : ''}`}
+              variant="text"
+              onClick={() => setToolType("lasso")}
+            >
+              <img
+                className="brush-img"
+                src={brushTools.lasso}
+                alt="lasso-tool"
+              />
+            </Button>
+          </CustomWidthTooltip>
+          <CustomWidthTooltip title="Polyline" arrow>
+            <Button
+              className={`toolbox-tool path-tool ${toolType === "path" ? 'active' : ''}`}
+              variant="text"
+              onClick={() => setToolType("path")}
+            >
+              <img
+                className="brush-img"
+                src={brushTools.polyline}
+                alt="path-tool"
+              />
+            </Button>
+          </CustomWidthTooltip>
+          <CustomWidthTooltip title="Eraser" arrow>
+            <Button
+              className={`toolbox-tool eraser-tool ${toolType === "eraser" ? 'active' : ''}`}
+              variant="text"
+              onClick={() => setToolType("eraser")}
+            >
+              <img
+                className="brush-img"
+                src={brushTools.eraser}
+                alt="eraser-tool"
+              />
+            </Button>
+          </CustomWidthTooltip>
         </div>
       </div>
       <div className="action-container">
         <div className="action-panel">
-          <Button
-            className="clear-tool"
-            variant="text"
-            disabled={url === ""}
-            onClick={() => clearCanvas()}
-          >
-            <img
-              className="action-img"
-              src={brushTools.clear}
-              alt="clear-tool"
-            />
-          </Button>
-          <Button
-            className="remove-tool"
-            variant="text"
-            disabled={url === ""}
-            onClick={() => clearFile()}
-          >
-            <img
-              className="action-img"
-              src={brushTools.remove}
-              alt="remove-tool"
-            />
-          </Button>
+          <CustomWidthTooltip title="Clear" arrow>
+            <Button
+              className="clear-tool"
+              variant="text"
+              disabled={url === ""}
+              onClick={() => clearCanvas()}
+            >
+              <img
+                className="action-img"
+                src={brushTools.clear}
+                alt="clear-tool"
+              />
+            </Button>
+          </CustomWidthTooltip>
+          <CustomWidthTooltip title="Remove" arrow>
+            <Button
+              className="remove-tool"
+              variant="text"
+              disabled={url === ""}
+              onClick={() => clearFile()}
+            >
+              <img
+                className="action-img"
+                src={brushTools.remove}
+                alt="remove-tool"
+              />
+            </Button>
+          </CustomWidthTooltip>
           <Divider orientation="vertical" flexItem />
-          <Button className="pan-tool" variant="text">
-            <img className="action-img" src={brushTools.pan} alt="pan-tool" />
-          </Button>
+          <CustomWidthTooltip title="Pan" arrow>
+            <Button className="pan-tool" variant="text">
+              <img className="action-img" src={brushTools.pan} alt="pan-tool" />
+            </Button>
+          </CustomWidthTooltip>
         </div>
       </div>
     </div>
