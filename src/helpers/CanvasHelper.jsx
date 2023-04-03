@@ -90,7 +90,83 @@ class CanvasHelper {
 
     lasso.splice(lasso.length - 1, 1, lastLasso);
     return(lasso.concat());
-  };  
+  };
+
+  static setupPolygonInfo = (initial, eraser, guides, polygon, mousePos, strokeWidth) => {
+    if (!initial && !guides.rect.length) {
+      return;
+    }
+    if (initial) {
+      if (eraser) {
+        return({
+          guideSet: guides,
+          polygonSet: [
+            ...polygon,
+            {
+              tool: "eraser",
+              points: [mousePos.x, mousePos.y, mousePos.x + 0.00000001, mousePos.y + 0.00000001],
+              width: strokeWidth,
+            }
+          ]
+        });
+      }
+      if (guides.complete) {
+        const polygonSet = ([
+          ...polygon,
+          {
+            tool: "polygon",
+            points: guides.rect.flatMap(e => Object.values(e)),
+            width: strokeWidth,
+          },
+        ]);
+        const guideSet = ({
+          rect: [],
+          lines: [],
+          complete: false
+        });
+        return ({
+          guideSet,
+          polygonSet
+        });
+      }
+      return({
+        guideSet: {
+          rect: [...guides.rect, ...[{x: mousePos.x, y: mousePos.y}]],
+          lines: [...guides.lines, ...[{startX: mousePos.x + 4, startY: mousePos.y + 4, endX: mousePos.x + 4, endY: mousePos.y + 4}]],
+          conplete: guides.complete
+        },
+        polygonSet: polygon
+      });
+    }
+
+    if (eraser) {
+      const newPoints = [mousePos.x, mousePos.y];
+      var pointIndex = polygon.length - 1
+      let lastPoint = polygon.at(pointIndex);
+      lastPoint.points = lastPoint.points.concat(newPoints);
+      polygon.splice(pointIndex, 1, lastPoint);
+      return({
+        guideSet: guides,
+        polygonSet: polygon.concat()
+      });
+    }
+
+    const lastGuide = guides.lines.at(guides.lines.length - 1);
+    if (Math.abs(mousePos.x - guides.rect.at(0).x) < 20 && Math.abs(mousePos.y - guides.rect.at(0).y) < 20) {
+      lastGuide.endX = guides.rect.at(0).x + 4;
+      lastGuide.endY = guides.rect.at(0).y + 4;
+      guides.complete = true;
+    } else {
+      lastGuide.endX = mousePos.x;
+      lastGuide.endY = mousePos.y;
+      guides.complete = false;
+    }
+    guides.lines.splice(guides.lines.length - 1, 1, lastGuide);
+    return({
+      guideSet: guides,
+      polygonSet: polygon
+    });
+  }
 }
 
 export default CanvasHelper;

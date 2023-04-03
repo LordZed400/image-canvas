@@ -1,6 +1,6 @@
 import { React, useState, useEffect, useRef } from "react";
 import Konva from "konva";
-import { Stage, Layer, Image, Line, Circle, Path, Group } from "react-konva";
+import { Stage, Layer, Image, Line, Circle, Path, Group, Rect } from "react-konva";
 import useImage from "use-image";
 import { Button, Divider, Tooltip, tooltipClasses } from "@mui/material";
 import { styled } from "@mui/material/styles";
@@ -35,6 +35,12 @@ const CanvasComponent = ({
   const [brush, setBrush] = useState([]);
   const [lasso, setLasso] = useState([]);
   const [path, setPath] = useState([]);
+  const [polygon, setPolygon] = useState([]);
+  const [guides, setGuides] = useState({
+    rect: [],
+    lines: [],
+    complete: false
+  });
   const isDrawing = useRef(false);
   const [image] = useImage(url);
   const imageRef = useRef();
@@ -67,6 +73,7 @@ const CanvasComponent = ({
       setBrush([]);
       setLasso([]);
       setPath([]);
+      setPolygon([]);
     }
   }, [url]);
 
@@ -85,6 +92,7 @@ const CanvasComponent = ({
     setBrush([]);
     setLasso([]);
     setPath([]);
+    setPolygon([]);
   };
 
   const LoadImage = () => {
@@ -139,12 +147,16 @@ const CanvasComponent = ({
       case "path":
         setupPathInfo(true);
         break;
+      case "polygon":
+        setupPolygonInfo(true);
+        break;
       case "lasso":
         setupLassoInfo(true);
         break;
       case "eraser":
         setupPathInfo(true, true);
         setupBrushInfo(true, true);
+        setupPolygonInfo(true, true);
         break;
       default:
         setupBrushInfo(true);
@@ -163,7 +175,7 @@ const CanvasComponent = ({
       y: mousePosition.y,
     });
     // no drawing - skipping
-    if (!isDrawing.current) {
+    if (!isDrawing.current && toolType !== "polygon") {
       return;
     }
 
@@ -171,12 +183,16 @@ const CanvasComponent = ({
       case "path":
         setupPathInfo(false);
         break;
+      case "polygon":
+        setupPolygonInfo(false);
+        break;
       case "lasso":
         setupLassoInfo(false);
         break;
       case "eraser":
         setupPathInfo(false, true);
         setupBrushInfo(false, true);
+        setupPolygonInfo(false, true);
         break;
       default:
         setupBrushInfo(false);
@@ -213,7 +229,16 @@ const CanvasComponent = ({
       return;
     }
     setLasso(lassoInfo);
-  };  
+  };
+
+  const setupPolygonInfo = (initial, eraser) => {
+    const polygonInfo = CanvasHelper.setupPolygonInfo(initial, eraser, guides, polygon, mousePos, strokeWidth);
+    if (!polygonInfo) {
+      return;
+    }
+    setGuides(polygonInfo.guideSet);
+    setPolygon(polygonInfo.polygonSet);
+  }
 
   return (
     <div className={`canvas-container ${!url ? "empty-canvas" : ""}`}>
@@ -252,14 +277,18 @@ const CanvasComponent = ({
               if (stageInfo.draggable) {
                 document.body.style.cursor = "grab";
               } else {
-                document.body.style.cursor = "default";
+                if (toolType === "polygon") {
+                  document.body.style.cursor = "cell";
+                } else {
+                  document.body.style.cursor = "default";
+                }
               }
               setEnableCursor(true);
             }}
             onMouseLeave={() => {
               setEnableCursor(false);
             }}
-            onDragMove={() => {
+            onDragEnd={() => {
               const pointerPos = stageRef.current.getPointerPosition();
               setMousePos({
                 x: pointerPos.x,
@@ -281,9 +310,12 @@ const CanvasComponent = ({
               {lasso.map((data, i) => (
                 <CreateShape key={i} line={data} />
               ))}
+              {polygon.map((data, i) => (
+                <CreatePolygons key={i} line={data} />
+              ))}
             </Layer>
             <Layer>
-              {url && enableCursor && !stageInfo.draggable && (
+              {url && enableCursor && toolType !== "polygon" && !stageInfo.draggable && (
                 <Circle
                   x={mousePos.x}
                   y={mousePos.y}
@@ -294,6 +326,31 @@ const CanvasComponent = ({
                   pixelSize={10}
                 />
               )}
+            </Layer>
+            <Layer>
+              {guides.lines.map((line, i) => (
+                <Line
+                  key={i}
+                  points={Object.values(line)}
+                  stroke="#000000"
+                  strokeWidth={2}
+                  opacity={1}
+                  lineCap="round"
+                  lineJoin="round"
+                />
+              ))}
+              {guides.rect.map((rect, i) => (
+                <Rect
+                  key={i}
+                  x={rect.x}
+                  y={rect.y}
+                  width={8}
+                  height={8}
+                  fill="white"
+                  stroke="#000000"
+                  strokeWidth={1}
+                />
+              ))}
             </Layer>
           </Stage>
         </div>
@@ -328,6 +385,21 @@ const CanvasComponent = ({
                 className="brush-img"
                 src={brushTools.polyline}
                 alt="path-tool"
+              />
+            </Button>
+          </CustomWidthTooltip>
+          <CustomWidthTooltip title="Polygon" arrow>
+            <Button
+              className={`toolbox-tool polygon-tool ${
+                toolType === "polygon" ? "active" : ""
+              }`}
+              variant="text"
+              onClick={() => setToolType("polygon")}
+            >
+              <img
+                className="brush-img"
+                src={brushTools.polygon}
+                alt="polygon-tool"
               />
             </Button>
           </CustomWidthTooltip>
@@ -403,7 +475,7 @@ const CanvasComponent = ({
               <img className="action-img" src={brushTools.pan} alt="pan-tool" />
             </Button>
           </CustomWidthTooltip>
-          <CustomWidthTooltip title="Reset Zoom" arrow>
+          <CustomWidthTooltip title="Center Image" arrow>
             <Button
               className={`action-tool zoom-tool`}
               variant="text"
@@ -458,4 +530,23 @@ const CreateLines = (value) => {
     </Group>
   );
 };
+
+const CreatePolygons = (value) => {
+  return (
+    <Group>
+      <Line
+        points={value.line.points}
+        fill="#df4b26"
+        stroke="#df4b26"
+        strokeWidth={value.line.tool === "eraser" ? value.line.width * 2 : 0}
+        opacity={value.line.tool === "eraser" ? 1 : 0.5}
+        closed={value.line.tool === "eraser" ? false : true} 
+        globalCompositeOperation={
+          value.line.tool === "eraser" ? "destination-out" : "source-over"
+        }
+      />
+    </Group>
+  );
+};
+
 export default CanvasComponent;
