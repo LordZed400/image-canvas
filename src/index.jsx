@@ -6,7 +6,7 @@ import {
 } from "react-router-dom";
 
 import LandingPage from './views/LandingPage/LandingPage';
-
+import FileHandler from './views/FileHandler/FileHandler';
 
 import './index.scss';
 
@@ -14,6 +14,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <LandingPage />,
+  },
+  {
+    path: "/canvas",
+    element: <FileHandler />,
   },
 ]);
 
