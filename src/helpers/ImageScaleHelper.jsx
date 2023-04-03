@@ -26,6 +26,26 @@ class ImageScaleHelper {
     }
     return centerPos;
   }
+
+  static calculateStageZoom = (target, deltaY) => {
+    const scaleBy = 1.02;
+    const stage = target.getStage();
+    const oldScale = stage.scaleX();
+    const mousePointTo = {
+      x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
+      y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
+    };
+
+    const newScale = deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+    return({
+      stageScale: newScale,
+      stageX:
+        -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
+      stageY:
+        -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
+    });
+  }
 }
 
 export default ImageScaleHelper;

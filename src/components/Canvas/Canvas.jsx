@@ -59,24 +59,7 @@ const CanvasComponent = ({
   const handleWheel = (e) => {
     e.evt.preventDefault();
 
-    const scaleBy = 1.02;
-    const stage = e.target.getStage();
-    const oldScale = stage.scaleX();
-    const mousePointTo = {
-      x: stage.getPointerPosition().x / oldScale - stage.x() / oldScale,
-      y: stage.getPointerPosition().y / oldScale - stage.y() / oldScale,
-    };
-
-    const newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
-
-    setStageInfo({
-      stageScale: newScale,
-      stageX:
-        -(mousePointTo.x - stage.getPointerPosition().x / newScale) * newScale,
-      stageY:
-        -(mousePointTo.y - stage.getPointerPosition().y / newScale) * newScale,
-      draggable: stageInfo.draggable,
-    });
+    setStageInfo({ ...ImageScaleHelper.calculateStageZoom(e.target, e.evt.deltaY), ...{draggable: stageInfo.draggable}});
   };
 
   useEffect(() => {
@@ -411,6 +394,15 @@ const CanvasComponent = ({
               onClick={() => setStageInfo({ ...stageInfo, ...{ draggable: !stageInfo.draggable } })}
             >
               <img className="action-img" src={brushTools.pan} alt="pan-tool" />
+            </Button>
+          </CustomWidthTooltip>
+          <CustomWidthTooltip title="Reset Zoom" arrow>
+            <Button
+              className={`action-tool zoom-tool`}
+              variant="text"
+              onClick={() => resetStageInfo()}
+            >
+              <img className="action-img" src={brushTools.zoom} alt="zoom-tool" />
             </Button>
           </CustomWidthTooltip>
         </div>
