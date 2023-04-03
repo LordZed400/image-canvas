@@ -1,7 +1,7 @@
 import React from 'react';
 import { Typography, Grid, Box } from '@mui/material';
 import { useNavigate } from "react-router-dom";
-import { imageSet } from '../../assets/Images/imageSet';
+import { imageSet } from '../../constants/imageSet';
 
 import ButtonComponent from '../../components/Button/Button';
 

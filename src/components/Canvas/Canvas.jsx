@@ -3,8 +3,11 @@ import Konva from "konva";
 import { Stage, Layer, Image, Line, Circle, Path, Group } from "react-konva";
 import useImage from "use-image";
 
-import "./Canvas.scss";
 import ImageScaleHelper from "../../helpers/ImageScaleHelper";
+import { brushTools } from "../../constants/brushTools";
+
+import "./Canvas.scss";
+import { Button, Divider } from "@mui/material";
 
 const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -314,6 +317,36 @@ const CanvasComponent = ({ url, clearCanvas , strokeWidth, toolType }) => {
             }
           </Layer>
         </Stage>
+      </div>
+      <div className="toolbox-container">
+        <div className="toolbox-panel">
+          <Button className="brush-tool" variant="text">
+            <img className="brush-img" src={brushTools.brush} alt="brush-tool" />
+          </Button>
+          <Button className="lasso-tool" variant="text">
+            <img className="brush-img" src={brushTools.lasso} alt="lasso-tool" />
+          </Button>
+          <Button className="path-tool" variant="text">
+            <img className="brush-img" src={brushTools.polyline} alt="path-tool" />
+          </Button>
+          <Button className="eraser-tool" variant="text">
+            <img className="brush-img" src={brushTools.eraser} alt="eraser-tool" />
+          </Button>
+        </div>
+      </div>
+      <div className="action-container">
+        <div className="action-panel">
+          <Button className="clear-tool" variant="text">
+            <img className="action-img" src={brushTools.clear} alt="clear-tool" />
+          </Button>
+          <Button className="remove-tool" variant="text">
+            <img className="action-img" src={brushTools.remove} alt="remove-tool" />
+          </Button>
+          <Divider orientation="vertical" flexItem />
+          <Button className="pan-tool" variant="text">
+            <img className="action-img" src={brushTools.pan} alt="pan-tool" />
+          </Button>
+        </div>
       </div>
     </div>
   );
