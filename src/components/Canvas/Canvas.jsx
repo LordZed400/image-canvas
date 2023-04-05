@@ -295,19 +295,17 @@ const CanvasComponent = ({
 
   const checkPolygonSelect = () => {
     const polygons = groupRef.current.children;
-    
-    polygons.forEach(element => {
+
+    polygons.forEach((element) => {
       const rect = element.getClientRect();
-      const points = element.getAttr('points');
-      
-      const isInside = Konva.Util.haveIntersection(
-        mousePos,
-        rect,
-        points,
-      );
-      
+      const points = element.getAttr("points");
+
+      const isInside = Konva.Util.haveIntersection(mousePos, rect, points);
+
       if (isInside) {
-        const pointsArray = polygon.map(e => e.points.flatMap(e => Object.values(e)));
+        const pointsArray = polygon.map((e) =>
+          e.points.flatMap((e) => Object.values(e))
+        );
         const index = pointsArray.indexOf(points);
         const clickedPolygon = polygon.at(index);
         clickedPolygon.clicked = true;
@@ -327,13 +325,13 @@ const CanvasComponent = ({
     // if (context.isPointInPath(mousePos.x, mousePos.y)) {
     //   console.log('Point is inside the shape');
     // }
-  }
+  };
 
   const resetPolygonClicks = () => {
     const tempPolygons = polygon;
-    tempPolygons.forEach(e => e.clicked = false);
+    tempPolygons.forEach((e) => (e.clicked = false));
     setPolygon(tempPolygons);
-  }
+  };
 
   const CreateShape = (value) => {
     const svgPath = value.line.points.reduce(
@@ -341,7 +339,7 @@ const CanvasComponent = ({
         `${path}${index === 0 ? "M" : "L"}${point.x},${point.y}`,
       ""
     );
-  
+
     return (
       <Group>
         <Path
@@ -354,7 +352,7 @@ const CanvasComponent = ({
       </Group>
     );
   };
-  
+
   const CreateLines = (value) => {
     return (
       <Group>
@@ -372,41 +370,43 @@ const CanvasComponent = ({
       </Group>
     );
   };
-  
-  const CreatePolygons = ({line, polylines}) => {
+
+  const CreatePolygons = ({ line, polylines }) => {
     return (
       <Group>
         <Line
-          points={line.points.flatMap(e => Object.values(e))}
+          points={line.points.flatMap((e) => Object.values(e))}
           fill="#df4b26"
           stroke="#df4b26"
           strokeWidth={0}
           opacity={0.5}
           closed={true}
         />
-        {line.clicked && polylines.map((line, i) => (
-          <Line
-            key={i}
-            points={Object.values(line)}
-            stroke="#000000"
-            strokeWidth={2}
-            opacity={1}
-            lineCap="round"
-            lineJoin="round"
-          />
-        ))}
-        {line.clicked && line.points.map((rect, i) => (
-          <Rect
-            key={i}
-            x={rect.x}
-            y={rect.y}
-            width={8}
-            height={8}
-            fill="white"
-            stroke="#000000"
-            strokeWidth={1}
-          />
-        ))}
+        {line.clicked &&
+          polylines.map((line, i) => (
+            <Line
+              key={i}
+              points={Object.values(line)}
+              stroke="#000000"
+              strokeWidth={2}
+              opacity={1}
+              lineCap="round"
+              lineJoin="round"
+            />
+          ))}
+        {line.clicked &&
+          line.points.map((rect, i) => (
+            <Rect
+              key={i}
+              x={rect.x}
+              y={rect.y}
+              width={8}
+              height={8}
+              fill="white"
+              stroke="#000000"
+              strokeWidth={1}
+            />
+          ))}
       </Group>
     );
   };
@@ -483,11 +483,15 @@ const CanvasComponent = ({
               ))}
               <Group ref={groupRef}>
                 {polygon.map((data, i) => (
-                  <CreatePolygons key={i} line={data} polylines={CanvasHelper.generatePolylines(data.points)}/>
+                  <CreatePolygons
+                    key={i}
+                    line={data}
+                    polylines={CanvasHelper.generatePolylines(data.points)}
+                  />
                 ))}
               </Group>
               {eraser.map((data, i) => (
-                <CreateLines key={i} line={data}/>
+                <CreateLines key={i} line={data} />
               ))}
             </Layer>
             <Layer>
