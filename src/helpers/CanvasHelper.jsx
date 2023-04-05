@@ -82,8 +82,9 @@ class CanvasHelper {
           ...polygon,
           {
             tool: "polygon",
-            points: guides.rect.flatMap(e => Object.values(e)),
+            points: guides.rect,
             width: strokeWidth,
+            clicked: false
           },
         ]);
         const guideSet = ({
@@ -121,6 +122,26 @@ class CanvasHelper {
       guideSet: guides,
       polygonSet: polygon
     });
+  }
+
+  static generatePolylines = (points) => {
+    var tempLines = [];
+    points.forEach(point => {
+      if (!tempLines.length) {
+        tempLines = [...tempLines, ...[{startX: point.x + 4, startY: point.y + 4, endX: null, endY: null}]];
+      } else {
+        const lastLine = tempLines[tempLines.length - 1];
+        lastLine.endX = point.x;
+        lastLine.endY = point.y;
+        tempLines.splice(tempLines.length - 1, 1, lastLine);
+        tempLines = [...tempLines, ...[{startX: point.x + 4, startY: point.y + 4, endX: null, endY: null}]];
+      }
+    });
+    const lastLine = tempLines[tempLines.length - 1];
+    lastLine.endX = points[0].x;
+    lastLine.endY = points[0].y;
+    tempLines.splice(tempLines.length - 1, 1, lastLine);
+    return(tempLines);
   }
 }
 

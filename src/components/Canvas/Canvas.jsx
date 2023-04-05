@@ -55,6 +55,7 @@ const CanvasComponent = ({
   const [image] = useImage(url);
   const imageRef = useRef();
   const stageRef = useRef();
+  const groupRef = useRef();
 
   const [stageInfo, setStageInfo] = useState({
     stageScale: 1,
@@ -170,6 +171,10 @@ const CanvasComponent = ({
       case "eraser":
         setupEraserInfo(true);
         break;
+      case "select":
+        resetPolygonClicks();
+        checkPolygonSelect();
+        break;
       default:
         setupBrushInfo(true);
         break;
@@ -203,6 +208,8 @@ const CanvasComponent = ({
         break;
       case "eraser":
         setupEraserInfo(false);
+        break;
+      case "select":
         break;
       default:
         setupBrushInfo(false);
@@ -286,6 +293,124 @@ const CanvasComponent = ({
     setEraser(eraserInfo);
   };
 
+  const checkPolygonSelect = () => {
+    const polygons = groupRef.current.children;
+    
+    polygons.forEach(element => {
+      const rect = element.getClientRect();
+      const points = element.getAttr('points');
+      
+      const isInside = Konva.Util.haveIntersection(
+        mousePos,
+        rect,
+        points,
+      );
+      
+      if (isInside) {
+        const pointsArray = polygon.map(e => e.points.flatMap(e => Object.values(e)));
+        const index = pointsArray.indexOf(points);
+        const clickedPolygon = polygon.at(index);
+        clickedPolygon.clicked = true;
+        polygon.splice(index, 1, clickedPolygon);
+        setPolygon(polygon);
+      }
+    });
+    // debugger
+    // const context = line.getContext();
+    // context.beginPath();
+    // context.moveTo(line.points()[0], line.points()[1]);
+    // for (let i = 2; i < line.points().length; i += 2) {
+    //   context.lineTo(line.points()[i], line.points()[i + 1]);
+    // }
+    // context.closePath();
+
+    // if (context.isPointInPath(mousePos.x, mousePos.y)) {
+    //   console.log('Point is inside the shape');
+    // }
+  }
+
+  const resetPolygonClicks = () => {
+    const tempPolygons = polygon;
+    tempPolygons.forEach(e => e.clicked = false);
+    setPolygon(tempPolygons);
+  }
+
+  const CreateShape = (value) => {
+    const svgPath = value.line.points.reduce(
+      (path, point, index) =>
+        `${path}${index === 0 ? "M" : "L"}${point.x},${point.y}`,
+      ""
+    );
+  
+    return (
+      <Group>
+        <Path
+          x={value.line.points.x}
+          y={value.line.points.y}
+          data={svgPath}
+          fill="#df4b26"
+          opacity={0.5}
+        />
+      </Group>
+    );
+  };
+  
+  const CreateLines = (value) => {
+    return (
+      <Group>
+        <Line
+          points={value.line.points}
+          stroke="#df4b26"
+          strokeWidth={value.line.width * 2}
+          opacity={value.line.tool === "eraser" ? 1 : 0.5}
+          lineCap="round"
+          lineJoin="round"
+          globalCompositeOperation={
+            value.line.tool === "eraser" ? "destination-out" : "source-over"
+          }
+        />
+      </Group>
+    );
+  };
+  
+  const CreatePolygons = ({line, polylines}) => {
+    return (
+      <Group>
+        <Line
+          points={line.points.flatMap(e => Object.values(e))}
+          fill="#df4b26"
+          stroke="#df4b26"
+          strokeWidth={0}
+          opacity={0.5}
+          closed={true}
+        />
+        {line.clicked && polylines.map((line, i) => (
+          <Line
+            key={i}
+            points={Object.values(line)}
+            stroke="#000000"
+            strokeWidth={2}
+            opacity={1}
+            lineCap="round"
+            lineJoin="round"
+          />
+        ))}
+        {line.clicked && line.points.map((rect, i) => (
+          <Rect
+            key={i}
+            x={rect.x}
+            y={rect.y}
+            width={8}
+            height={8}
+            fill="white"
+            stroke="#000000"
+            strokeWidth={1}
+          />
+        ))}
+      </Group>
+    );
+  };
+
   return (
     <div className={`canvas-container ${!url ? "empty-canvas" : ""}`}>
       {!url && (
@@ -356,17 +481,20 @@ const CanvasComponent = ({
               {lasso.map((data, i) => (
                 <CreateShape key={i} line={data} />
               ))}
-              {polygon.map((data, i) => (
-                <CreatePolygons key={i} line={data} />
-              ))}
+              <Group ref={groupRef}>
+                {polygon.map((data, i) => (
+                  <CreatePolygons key={i} line={data} polylines={CanvasHelper.generatePolylines(data.points)}/>
+                ))}
+              </Group>
               {eraser.map((data, i) => (
-                <CreateLines key={i} line={data} />
+                <CreateLines key={i} line={data}/>
               ))}
             </Layer>
             <Layer>
               {url &&
                 enableCursor &&
                 toolType !== "polygon" &&
+                toolType !== "select" &&
                 !stageInfo.draggable && (
                   <Circle
                     x={mousePos.x}
@@ -537,7 +665,22 @@ const CanvasComponent = ({
               <img className="action-img" src={brushTools.pan} alt="pan-tool" />
             </Button>
           </CustomWidthTooltip>
-          <CustomWidthTooltip title="Center Image" arrow>
+          <CustomWidthTooltip title="Select Polygon" arrow>
+            <Button
+              className={`action-tool select-tool ${
+                toolType === "select" ? "active" : ""
+              }`}
+              variant="text"
+              onClick={() => setToolType("select")}
+            >
+              <img
+                className="action-img"
+                src={brushTools.select}
+                alt="select-tool"
+              />
+            </Button>
+          </CustomWidthTooltip>
+          <CustomWidthTooltip title="Reset Zoom" arrow>
             <Button
               className="action-tool zoom-tool"
               variant="text"
@@ -553,59 +696,6 @@ const CanvasComponent = ({
         </div>
       </div>
     </div>
-  );
-};
-
-const CreateShape = (value) => {
-  const svgPath = value.line.points.reduce(
-    (path, point, index) =>
-      `${path}${index === 0 ? "M" : "L"}${point.x},${point.y}`,
-    ""
-  );
-
-  return (
-    <Group>
-      <Path
-        x={value.line.points.x}
-        y={value.line.points.y}
-        data={svgPath}
-        fill="#df4b26"
-        opacity={0.5}
-      />
-    </Group>
-  );
-};
-
-const CreateLines = (value) => {
-  return (
-    <Group>
-      <Line
-        points={value.line.points}
-        stroke="#df4b26"
-        strokeWidth={value.line.width * 2}
-        opacity={value.line.tool === "eraser" ? 1 : 0.5}
-        lineCap="round"
-        lineJoin="round"
-        globalCompositeOperation={
-          value.line.tool === "eraser" ? "destination-out" : "source-over"
-        }
-      />
-    </Group>
-  );
-};
-
-const CreatePolygons = (value) => {
-  return (
-    <Group>
-      <Line
-        points={value.line.points}
-        fill="#df4b26"
-        stroke="#df4b26"
-        strokeWidth={0}
-        opacity={0.5}
-        closed={true}
-      />
-    </Group>
   );
 };
 

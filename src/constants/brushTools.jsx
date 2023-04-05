@@ -7,5 +7,6 @@ export const polyline = require('./../assets/Images/Tools/polyline.png');
 export const clear = require('./../assets/Images/Tools/clear.png');
 export const remove = require('./../assets/Images/Tools/remove.png');
 export const zoom = require('./../assets/Images/Tools/zoom.png');
+export const select = require('./../assets/Images/Tools/select.png');
 
-export const brushTools = {brush, eraser, lasso, pan, polygon, polyline, clear, remove, zoom};
+export const brushTools = {brush, eraser, lasso, pan, polygon, polyline, clear, remove, zoom, select};
