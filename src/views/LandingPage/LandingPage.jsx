@@ -38,26 +38,20 @@ const LandingPage = () => {
               spacing={{ xs: 2, md: 3 }}
               columns={{ xs: 4, sm: 8, md: 12 }}
             >
-              <Grid className="grid-item main-title" item xs={4} sm={4} md={4}>
+              <Grid className="grid-item main-title" size={{ xs: 4, sm: 4, md: 4 }}>
                 <div className="label">
                   Choose any of the following images to draw on
                 </div>
               </Grid>
               <Grid
                 className="grid-item divider-text"
-                item
-                xs={4}
-                sm={4}
-                md={4}
+                size={{ xs: 4, sm: 4, md: 4 }}
               >
                 <div className="label">or</div>
               </Grid>
               <Grid
                 className="grid-item navigate-link"
-                item
-                xs={4}
-                sm={4}
-                md={4}
+                size={{ xs: 4, sm: 4, md: 4 }}
               >
                 <ButtonComponent
                   clickEvent={navigateWithoutImage}
@@ -76,7 +70,7 @@ const LandingPage = () => {
               columns={{ xs: 4, sm: 8, md: 12 }}
             >
               {imageSet.map((item, index) => (
-                <Grid item xs={3} sm={3} md={3} key={index}>
+                <Grid size={{ xs: 3, sm: 3, md: 3 }} key={index}>
                   <div
                     className="image-set-container"
                     onClick={() => navigateWithImage(item, index)}

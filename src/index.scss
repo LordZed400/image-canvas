@@ -1,6 +1,6 @@
-@import "./styling/Variables";
-@import "./styling/Mixins";
-@import "./styling/Fonts";
+@forward 'styling/Variables';
+@forward 'styling/Mixins';
+@forward 'styling/Fonts';
 
 body {
   margin: 0;
